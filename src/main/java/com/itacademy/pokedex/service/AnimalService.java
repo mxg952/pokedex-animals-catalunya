@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import repository.AnimalRepository;
 import repository.UserAnimalRepository;
 
+import java.util.List;
+
 @Service
 public class AnimalService {
 
@@ -38,4 +40,12 @@ public class AnimalService {
 
         return userAnimalRepository.save(userAnimal);
     }
+
+    public List<UserAnimal> findUserAnimals(Long userId) {
+         return animalRepository.findByUserId(userId);
+    }
+
+
+
+
 }

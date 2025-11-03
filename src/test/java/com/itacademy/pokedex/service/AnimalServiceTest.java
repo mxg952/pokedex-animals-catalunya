@@ -5,6 +5,7 @@ import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
 import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
 import com.itacademy.pokedex.model.entity.UserAnimal;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import repository.AnimalRepository;
 import repository.UserAnimalRepository;
+
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -92,6 +95,32 @@ public class AnimalServiceTest {
         assertThrows(AnimalNotFoundException.class, () -> animalService.unlockAnimal(userId, request));
     }
 
+    @Test
+    void givenUser_whenSeeHisAnimals_thenReturnUserAnimals() {
+
+        Long userId = 1l;
+        String animalName = "Senglar";
+        MultipartFile photo = new MockMultipartFile("foto", "senglar.jpg", "image/jpeg",
+                "dummy".getBytes());
+
+        Animal animal = new Animal();
+        animal.setId(10L);
+        animal.setCommonName(animalName);
+
+        UserAnimal userAnimal = new UserAnimal();
+        userAnimal.setUserId(userId);
+        userAnimal.setAnimal(animal);
+        userAnimal.setStatus(AnimalStatus.UNLOCK);
+
+        Mockito.when(animalService.findUserAnimals(userId)).thenReturn(List.of(userAnimal));
+
+        List<UserAnimal> result = animalService.findUserAnimals(userId);
+
+        assertEquals(1, result.size());
+        assertEquals(userId, result.get(0).getUserId());
+        assertEquals(animalName, result.get(0).getAnimal().getCommonName());
+        assertEquals(AnimalStatus.UNLOCK, result.get(0).getStatus());
+    }
 
 
 }
