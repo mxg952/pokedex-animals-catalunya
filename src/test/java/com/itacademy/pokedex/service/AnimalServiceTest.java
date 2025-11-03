@@ -1,6 +1,6 @@
 package com.itacademy.pokedex.service;
 
-import com.itacademy.pokedex.model.dto.request.AnimalRequest;
+import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
 import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
 import com.itacademy.pokedex.model.entity.UserAnimal;
@@ -46,7 +46,7 @@ public class AnimalServiceTest {
         userAnimalLock.setAnimal(animal);
         userAnimalLock.setStatus(AnimalStatus.LOCK);
 
-        AnimalRequest request = new AnimalRequest();
+        UnlockAnimalRequest request = new UnlockAnimalRequest();
         request.setCommonName(animalName);
         request.setPhotoUrl(photo);
 

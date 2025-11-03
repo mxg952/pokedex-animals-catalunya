@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Builder
 @Data
-public class AnimalRequest {
+public class UnlockAnimalRequest {
 
     @NotNull
     @Size(min = 2, max = 50, message = "Nom del animal invàlid")

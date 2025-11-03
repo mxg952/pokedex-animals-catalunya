@@ -2,7 +2,7 @@ package com.itacademy.pokedex.service;
 
 import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
 import com.itacademy.pokedex.exceptions.UserAnimalNotFound;
-import com.itacademy.pokedex.model.dto.request.AnimalRequest;
+import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
 import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
 import com.itacademy.pokedex.model.entity.UserAnimal;
@@ -21,7 +21,7 @@ public class AnimalService {
         this.userAnimalRepository = userAnimalRepository;
     }
 
-    public UserAnimal unlockAnimal(Long userId, AnimalRequest request) {
+    public UserAnimal unlockAnimal(Long userId, UnlockAnimalRequest request) {
         Animal animal = animalRepository.findByCommonName(request.getCommonName())
                 .orElseThrow(() -> new AnimalNotFoundException("L'animal no s'ha trobat"));
 
