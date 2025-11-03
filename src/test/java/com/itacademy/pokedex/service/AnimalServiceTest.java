@@ -1,5 +1,6 @@
 package com.itacademy.pokedex.service;
 
+import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
 import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
 import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
@@ -16,6 +17,7 @@ import repository.AnimalRepository;
 import repository.UserAnimalRepository;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +72,24 @@ public class AnimalServiceTest {
         assertEquals("senglar.jpg", result.getPhotoUrl());
         assertEquals(userId, result.getUserId());
         assertEquals(animal, result.getAnimal());
+    }
+
+    @Test
+    void givenUnlockAnimalRequest_whenAnimalNotFound_thenExceptionShouldBeenThrown() {
+
+        Long userId = 1L;
+        String animalName = "Senglar";
+        MultipartFile photo = new MockMultipartFile("foto", "senglar.jpg", "image/jpeg",
+                "dummy".getBytes());
+
+        UnlockAnimalRequest request = new UnlockAnimalRequest();
+        request.setCommonName(animalName);
+        request.setPhotoUrl(photo);
+
+        Mockito.when(animalRepository.findByCommonName(animalName))
+                .thenReturn(Optional.empty());
+
+        assertThrows(AnimalNotFoundException.class, () -> animalService.unlockAnimal(userId, request));
     }
 
 

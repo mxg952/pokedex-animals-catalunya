@@ -23,13 +23,14 @@ public class AnimalController {
 
  private final AnimalService animalService;
 
+ /*
  @PostMapping("/user-animals/unlock")
     public ResponseEntity<UserAnimal> unlockAnimal(@Valid @RequestBody UnlockAnimalRequest request,
                                                    @AuthenticationPrincipal CustomUserDetails userDetails) {
      Long userId = userDetails.getId();
         return ResponseEntity
-                .status(HttpStatus.ACCEPTED);
+                .status(HttpStatus.ACCEPTED)
                 .body(animalService.unlockAnimal(userId,request));
- }
+ }*/
 
 }

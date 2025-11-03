@@ -26,7 +26,7 @@ public class AnimalService {
                 .orElseThrow(() -> new AnimalNotFoundException("L'animal no s'ha trobat"));
 
         UserAnimal userAnimal = userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId())
-                .orElseThrow(() -> new UserAnimalNotFound("El UserAnimal no s'ha trobat"));
+                .orElseThrow(() -> new UserAnimalNotFound("L'animal no s'ha trobat"));
 
         userAnimal.setStatus(AnimalStatus.UNLOCK);
 
