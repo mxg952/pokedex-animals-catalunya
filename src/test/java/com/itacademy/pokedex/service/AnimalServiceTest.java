@@ -5,9 +5,11 @@ import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
 import com.itacademy.pokedex.model.entity.UserAnimal;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import repository.AnimalRepository;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 public class AnimalServiceTest {
 
     @Mock
@@ -48,7 +51,8 @@ public class AnimalServiceTest {
         request.setPhotoUrl(photo);
 
         Mockito.when(animalRepository.findByCommonName(animalName)).thenReturn(Optional.of(animal));
-        Mockito.when(userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId())).thenReturn(Optional.of(userAnimalLock));
+        Mockito.when(userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId()))
+                .thenReturn(Optional.of(userAnimalLock));
 
         // Quan guardem l'entitat UserAnimal, simplement retornem la mateixa entitat
         Mockito.when(userAnimalRepository.save(any(UserAnimal.class)))
@@ -66,7 +70,8 @@ public class AnimalServiceTest {
         assertEquals("senglar.jpg", result.getPhotoUrl());
         assertEquals(userId, result.getUserId());
         assertEquals(animal, result.getAnimal());
-
     }
+
+
 
 }
