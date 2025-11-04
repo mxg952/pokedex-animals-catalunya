@@ -96,9 +96,9 @@ public class AnimalServiceTest {
     }
 
     @Test
-    void givenUser_whenSeeHisAnimals_thenReturnUserAnimals() {
+    void givenUser_whenGetUserAnimals_thenReturnUserAnimals() {
 
-        Long userId = 1l;
+        Long userId = 1L;
         String animalName = "Senglar";
         MultipartFile photo = new MockMultipartFile("foto", "senglar.jpg", "image/jpeg",
                 "dummy".getBytes());
@@ -121,6 +121,23 @@ public class AnimalServiceTest {
         assertEquals(animalName, result.get(0).getAnimal().getCommonName());
         assertEquals(AnimalStatus.UNLOCK, result.get(0).getStatus());
     }
+
+    @Test
+    void givenExistingAnimals_whenGetAllAnimals_thenReturnAnimalList() {
+
+        Animal animal = new Animal();
+        animal.setId(10L);
+        animal.setCommonName("Gat");
+
+        Mockito.when(animalService.getAllAnimals()).thenReturn(List.of(animal));
+
+        List<Animal> result = animalService.getAllAnimals();
+
+        assertEquals(1, result.size());
+        assertEquals("Gat", result.get(0).getCommonName());
+        assertEquals(10L,result.get(0).getId());
+    }
+
 
 
 }

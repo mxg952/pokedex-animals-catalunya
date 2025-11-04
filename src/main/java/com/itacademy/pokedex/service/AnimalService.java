@@ -45,6 +45,10 @@ public class AnimalService {
          return animalRepository.findByUserId(userId);
     }
 
+    public List<Animal> getAllAnimals() {
+        return animalRepository.findAll();
+    }
+
 
 
 
