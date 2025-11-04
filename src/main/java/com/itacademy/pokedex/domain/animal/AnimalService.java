@@ -1,14 +1,12 @@
-package com.itacademy.pokedex.service;
+package com.itacademy.pokedex.domain.animal;
 
 import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
 import com.itacademy.pokedex.exceptions.UserAnimalNotFound;
 import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
-import com.itacademy.pokedex.model.entity.Animal;
-import com.itacademy.pokedex.model.entity.AnimalStatus;
-import com.itacademy.pokedex.model.entity.UserAnimal;
+import com.itacademy.pokedex.domain.useranimal.AnimalStatus;
+import com.itacademy.pokedex.domain.useranimal.UserAnimal;
 import org.springframework.stereotype.Service;
-import repository.AnimalRepository;
-import repository.UserAnimalRepository;
+import com.itacademy.pokedex.domain.useranimal.UserAnimalRepository;
 
 import java.util.List;
 

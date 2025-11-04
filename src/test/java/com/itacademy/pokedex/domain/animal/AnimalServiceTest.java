@@ -1,10 +1,9 @@
-package com.itacademy.pokedex.service;
+package com.itacademy.pokedex.domain.animal;
 
 import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
 import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
-import com.itacademy.pokedex.model.entity.Animal;
-import com.itacademy.pokedex.model.entity.AnimalStatus;
-import com.itacademy.pokedex.model.entity.UserAnimal;
+import com.itacademy.pokedex.domain.useranimal.AnimalStatus;
+import com.itacademy.pokedex.domain.useranimal.UserAnimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,8 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import repository.AnimalRepository;
-import repository.UserAnimalRepository;
+import com.itacademy.pokedex.domain.useranimal.UserAnimalRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +76,6 @@ public class AnimalServiceTest {
 
     @Test
     void givenUnlockAnimalRequest_whenAnimalNotFound_thenExceptionShouldBeenThrown() {
-
         Long userId = 1L;
         String animalName = "Senglar";
         MultipartFile photo = new MockMultipartFile("foto", "senglar.jpg", "image/jpeg",
@@ -96,34 +93,27 @@ public class AnimalServiceTest {
 
     @Test
     void givenUser_whenGetUserAnimals_thenReturnUserAnimals() {
-
-        Long userId = 1L;
-        String animalName = "Senglar";
-        MultipartFile photo = new MockMultipartFile("foto", "senglar.jpg", "image/jpeg",
-                "dummy".getBytes());
-
         Animal animal = new Animal();
         animal.setId(10L);
-        animal.setCommonName(animalName);
+        animal.setCommonName("Senglar");
 
         UserAnimal userAnimal = new UserAnimal();
-        userAnimal.setUserId(userId);
+        userAnimal.setUserId(1L);
         userAnimal.setAnimal(animal);
         userAnimal.setStatus(AnimalStatus.UNLOCK);
 
-        Mockito.when(animalService.getUserAnimals(userId)).thenReturn(List.of(userAnimal));
+        Mockito.when(animalService.getUserAnimals(1L)).thenReturn(List.of(userAnimal));
 
-        List<UserAnimal> result = animalService.getUserAnimals(userId);
+        List<UserAnimal> result = animalService.getUserAnimals(1L);
 
         assertEquals(1, result.size());
-        assertEquals(userId, result.get(0).getUserId());
-        assertEquals(animalName, result.get(0).getAnimal().getCommonName());
+        assertEquals(1L, result.get(0).getUserId());
+        assertEquals("Senglar", result.get(0).getAnimal().getCommonName());
         assertEquals(AnimalStatus.UNLOCK, result.get(0).getStatus());
     }
 
     @Test
     void givenExistingAnimals_whenGetAllAnimals_thenReturnAnimalList() {
-
         Animal animal = new Animal();
         animal.setId(10L);
         animal.setCommonName("Gat");

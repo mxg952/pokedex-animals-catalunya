@@ -1,5 +1,6 @@
-package com.itacademy.pokedex.model.entity;
+package com.itacademy.pokedex.domain.useranimal;
 
+import com.itacademy.pokedex.domain.animal.Animal;
 import jakarta.persistence.*;
 import lombok.*;
 

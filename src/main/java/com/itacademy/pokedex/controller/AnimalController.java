@@ -1,17 +1,11 @@
 package com.itacademy.pokedex.controller;
 
-import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
-import com.itacademy.pokedex.model.entity.Animal;
-import com.itacademy.pokedex.model.entity.UserAnimal;
-import com.itacademy.pokedex.service.AnimalService;
-import jakarta.validation.Valid;
-import lombok.NoArgsConstructor;
+import com.itacademy.pokedex.domain.animal.Animal;
+import com.itacademy.pokedex.domain.animal.AnimalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
