@@ -41,7 +41,7 @@ public class AnimalService {
         return userAnimalRepository.save(userAnimal);
     }
 
-    public List<UserAnimal> findUserAnimals(Long userId) {
+    public List<UserAnimal> getUserAnimals(Long userId) {
          return animalRepository.findByUserId(userId);
     }
 

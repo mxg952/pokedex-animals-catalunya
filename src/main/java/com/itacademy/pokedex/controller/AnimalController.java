@@ -1,6 +1,7 @@
 package com.itacademy.pokedex.controller;
 
 import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
+import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.UserAnimal;
 import com.itacademy.pokedex.service.AnimalService;
 import jakarta.validation.Valid;
@@ -38,12 +39,14 @@ public class AnimalController {
     public ResponseEntity<List<UserAnimal>> getUserAnimals(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(animalService.findUserAnimals(userDetails.getId()));
+                .body(animalService.getUserAnimals(userDetails.getId()));
     }*/
 
-    @GetMapping("")
+    @GetMapping("/animals")
     public ResponseEntity<List<Animal>> getAllAnimals() {
-
+        return  ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(animalService.getAllAnimals());
     }
 
 }

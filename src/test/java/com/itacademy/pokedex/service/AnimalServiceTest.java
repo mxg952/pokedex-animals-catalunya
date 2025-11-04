@@ -5,7 +5,6 @@ import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
 import com.itacademy.pokedex.model.entity.Animal;
 import com.itacademy.pokedex.model.entity.AnimalStatus;
 import com.itacademy.pokedex.model.entity.UserAnimal;
-import org.apache.catalina.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -112,9 +111,9 @@ public class AnimalServiceTest {
         userAnimal.setAnimal(animal);
         userAnimal.setStatus(AnimalStatus.UNLOCK);
 
-        Mockito.when(animalService.findUserAnimals(userId)).thenReturn(List.of(userAnimal));
+        Mockito.when(animalService.getUserAnimals(userId)).thenReturn(List.of(userAnimal));
 
-        List<UserAnimal> result = animalService.findUserAnimals(userId);
+        List<UserAnimal> result = animalService.getUserAnimals(userId);
 
         assertEquals(1, result.size());
         assertEquals(userId, result.get(0).getUserId());
