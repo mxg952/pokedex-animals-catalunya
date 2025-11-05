@@ -1,7 +1,7 @@
 package com.itacademy.pokedex.domain.animal.repository;
 
-import com.itacademy.pokedex.domain.animal.entity.Animal;
-import com.itacademy.pokedex.domain.useranimal.UserAnimal;
+import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
+import com.itacademy.pokedex.domain.useranimal.modelo.entity.UserAnimal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
