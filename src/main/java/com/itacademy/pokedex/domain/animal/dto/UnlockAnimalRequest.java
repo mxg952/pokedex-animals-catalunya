@@ -1,4 +1,4 @@
-package com.itacademy.pokedex.model.dto.request;
+package com.itacademy.pokedex.domain.animal.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

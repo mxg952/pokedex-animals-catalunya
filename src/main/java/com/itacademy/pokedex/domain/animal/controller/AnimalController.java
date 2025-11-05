@@ -1,7 +1,7 @@
-package com.itacademy.pokedex.controller;
+package com.itacademy.pokedex.domain.animal.controller;
 
-import com.itacademy.pokedex.domain.animal.Animal;
-import com.itacademy.pokedex.domain.animal.AnimalService;
+import com.itacademy.pokedex.domain.animal.entity.Animal;
+import com.itacademy.pokedex.domain.animal.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

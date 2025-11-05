@@ -1,7 +1,10 @@
 package com.itacademy.pokedex.domain.animal;
 
+import com.itacademy.pokedex.domain.animal.entity.Animal;
+import com.itacademy.pokedex.domain.animal.service.AnimalService;
+import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
-import com.itacademy.pokedex.model.dto.request.UnlockAnimalRequest;
+import com.itacademy.pokedex.domain.animal.dto.UnlockAnimalRequest;
 import com.itacademy.pokedex.domain.useranimal.AnimalStatus;
 import com.itacademy.pokedex.domain.useranimal.UserAnimal;
 import org.junit.jupiter.api.Test;

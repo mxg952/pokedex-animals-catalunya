@@ -1,4 +1,4 @@
-package com.itacademy.pokedex.domain.animal;
+package com.itacademy.pokedex.domain.animal.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
