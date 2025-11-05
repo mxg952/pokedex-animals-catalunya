@@ -1,14 +1,16 @@
-package com.itacademy.pokedex.service;
+package com.itacademy.pokedex.domain.animal.service;
 
+import com.itacademy.pokedex.domain.animal.entity.Animal;
+import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.exceptions.AnimalNotFoundException;
 import com.itacademy.pokedex.exceptions.UserAnimalNotFound;
-import com.itacademy.pokedex.model.dto.request.AnimalRequest;
-import com.itacademy.pokedex.model.entity.Animal;
-import com.itacademy.pokedex.model.entity.AnimalStatus;
-import com.itacademy.pokedex.model.entity.UserAnimal;
+import com.itacademy.pokedex.domain.animal.dto.UnlockAnimalRequest;
+import com.itacademy.pokedex.domain.useranimal.AnimalStatus;
+import com.itacademy.pokedex.domain.useranimal.UserAnimal;
 import org.springframework.stereotype.Service;
-import repository.AnimalRepository;
-import repository.UserAnimalRepository;
+import com.itacademy.pokedex.domain.useranimal.UserAnimalRepository;
+
+import java.util.List;
 
 @Service
 public class AnimalService {
@@ -21,12 +23,12 @@ public class AnimalService {
         this.userAnimalRepository = userAnimalRepository;
     }
 
-    public UserAnimal unlockAnimal(Long userId, AnimalRequest request) {
+    public UserAnimal unlockAnimal(Long userId, UnlockAnimalRequest request) {
         Animal animal = animalRepository.findByCommonName(request.getCommonName())
                 .orElseThrow(() -> new AnimalNotFoundException("L'animal no s'ha trobat"));
 
         UserAnimal userAnimal = userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId())
-                .orElseThrow(() -> new UserAnimalNotFound("El UserAnimal no s'ha trobat"));
+                .orElseThrow(() -> new UserAnimalNotFound("L'animal no s'ha trobat"));
 
         userAnimal.setStatus(AnimalStatus.UNLOCK);
 
@@ -38,4 +40,16 @@ public class AnimalService {
 
         return userAnimalRepository.save(userAnimal);
     }
+
+    public List<UserAnimal> getUserAnimals(Long userId) {
+         return animalRepository.findByUserId(userId);
+    }
+
+    public List<Animal> getAllAnimals() {
+        return animalRepository.findAll();
+    }
+
+
+
+
 }

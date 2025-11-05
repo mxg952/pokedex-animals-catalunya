@@ -1,4 +1,4 @@
-package com.itacademy.pokedex.model.dto.request;
+package com.itacademy.pokedex.domain.animal.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Builder
 @Data
-public class AnimalRequest {
+public class UnlockAnimalRequest {
 
     @NotNull
     @Size(min = 2, max = 50, message = "Nom del animal invàlid")
