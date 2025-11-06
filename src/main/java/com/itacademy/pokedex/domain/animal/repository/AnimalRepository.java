@@ -10,8 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
-    Optional<Animal> findByCommonName(String nomColoquial);
+    Optional<Animal> findByCommonName(String commonName);
     List<UserAnimal> findByUserId(Long userId);
+    List<Animal> findByCommonNameContainingIgnoreCase(String commonName);
 
 
 }
