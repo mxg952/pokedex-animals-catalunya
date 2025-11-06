@@ -1,6 +1,5 @@
 package com.itacademy.pokedex.domain.user.dto;
 
-import com.itacademy.pokedex.domain.user.modelo.Role;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class RegisterRequest {
+public class LoginRequest {
 
     @NotNull
     @Size(min = 2, max = 50, message = "Nom invàlid...")
