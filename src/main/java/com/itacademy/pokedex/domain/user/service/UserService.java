@@ -43,7 +43,7 @@ public class UserService {
                 )
         );
 
-        User user = userRepository.findByUsername(request.getName())
+        User user = userRepository.findByName(request.getName())
                 .orElseThrow(() -> new UserNotFoundException("No existeix cap usuari amb aquest nom..."));
 
         String token = jwtService.generateToken(user);
