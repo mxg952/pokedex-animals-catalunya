@@ -3,7 +3,7 @@ package com.itacademy.pokedex.domain.user;
 import com.itacademy.pokedex.domain.user.dto.LoginRequest;
 import com.itacademy.pokedex.domain.user.dto.RegisterRequest;
 import com.itacademy.pokedex.domain.user.exception.UserNotFoundException;
-import com.itacademy.pokedex.domain.user.exception.UsernameAlreadyExistsException;
+import com.itacademy.pokedex.domain.user.exception.UserNameAlreadyExistsException;
 import com.itacademy.pokedex.domain.user.mapper.RegisterMapper;
 import com.itacademy.pokedex.domain.user.modelo.Role;
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
@@ -79,7 +79,7 @@ public class UserTest {
         when(userRepository.existsByUsername("marc")).thenReturn(true);
 
         assertThatThrownBy(() -> userService.register(request))
-                .isInstanceOf(UsernameAlreadyExistsException.class)
+                .isInstanceOf(UserNameAlreadyExistsException.class)
                 .hasMessageContaining("Username already exists");
     }
 
