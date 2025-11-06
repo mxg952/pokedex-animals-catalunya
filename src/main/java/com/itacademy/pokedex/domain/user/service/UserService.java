@@ -3,6 +3,7 @@ package com.itacademy.pokedex.domain.user.service;
 import com.itacademy.pokedex.domain.user.dto.LoginRequest;
 import com.itacademy.pokedex.domain.user.dto.RegisterRequest;
 import com.itacademy.pokedex.domain.user.exception.UserNotFoundException;
+import com.itacademy.pokedex.domain.user.exception.UsernameAlreadyExistsException;
 import com.itacademy.pokedex.domain.user.mapper.RegisterMapper;
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.repository.UserRepository;
@@ -24,6 +25,9 @@ public class UserService {
 
 
     public JwtResponse register(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getName())) {
+            throw new UsernameAlreadyExistsException(request.getName());
+        }
         User user = registerMapper.toEntity(request, encoder);
         userRepository.save(user);
 
