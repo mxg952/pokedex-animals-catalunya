@@ -12,11 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Builder
 @Data
-public class UnlockRequest {
+public class UnlockAnimalRequest {
 
     @NotNull
     @Size(min = 2, max = 50, message = "Nom del animal invàlid")
     private String commonName;
-    private MultipartFile photoUrl;
+    private MultipartFile file;
+    private String description;
 
 }

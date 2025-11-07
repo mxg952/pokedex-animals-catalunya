@@ -1,15 +1,23 @@
 package com.itacademy.pokedex.domain.useranimal.service;
 
-import com.itacademy.pokedex.domain.useranimal.dto.UnlockRequest;
+import com.itacademy.pokedex.domain.animal.mapper.AnimalMapper;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
-import com.itacademy.pokedex.domain.useranimal.modelo.AnimalStatus;
-import com.itacademy.pokedex.domain.useranimal.modelo.entity.UserAnimal;
+import com.itacademy.pokedex.domain.useranimal.dto.UnlockAnimalRequest;
+import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
+import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalStats;
+import com.itacademy.pokedex.domain.useranimal.exception.*;
+import com.itacademy.pokedex.domain.useranimal.mapper.UserAnimalMapper;
+import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
+import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimal;
+import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
+import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
 import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
-import com.itacademy.pokedex.domain.useranimal.exception.UserAnimalNotFound;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 @Service
@@ -17,28 +25,101 @@ public class UserAnimalService {
 
     private final AnimalRepository animalRepository;
     private final UserAnimalRepository userAnimalRepository;
+    private final FileStorageService fileStorageService;
+    private final UserAnimalMapper userAnimalMapper;
+    private final UserAnimalPhotoRepository userAnimalPhotoRepository;
 
-    public UserAnimalService(AnimalRepository animalRepository, UserAnimalRepository userAnimalRepository) {
+    public UserAnimalService(AnimalRepository animalRepository, UserAnimalRepository userAnimalRepository, FileStorageService fileStorageService, AnimalMapper animalMapper, UserAnimalMapper userAnimalMapper, UserAnimalPhotoRepository userAnimalPhotoRepository) {
         this.animalRepository = animalRepository;
         this.userAnimalRepository = userAnimalRepository;
+        this.fileStorageService = fileStorageService;
+        this.userAnimalMapper = userAnimalMapper;
+        this.userAnimalPhotoRepository = userAnimalPhotoRepository;
     }
 
-    public UserAnimal unlockAnimal(Long userId, UnlockRequest request) {
+    public UserAnimalDto unlockAnimal(Long userId, UnlockAnimalRequest request) {
+        // Verificar animal existeix
         Animal animal = animalRepository.findByCommonName(request.getCommonName())
-                .orElseThrow(() -> new AnimalNotFoundException("L'animal no s'ha trobat"));
+                .orElseThrow(() -> new AnimalNotFoundException("L'animal no s'ha trobat..."));
 
-        UserAnimal userAnimal = userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId())
-                .orElseThrow(() -> new UserAnimalNotFound("L'animal no s'ha trobat"));
-
-        userAnimal.setStatus(AnimalStatus.UNLOCK);
-
-        if (request.getPhotoUrl() != null && !request.getPhotoUrl().isEmpty()) {
-            // Aquí només guardem el nom de la foto per simplificar
-            // En una app real, aquí guardaries el fitxer a un directori o servei cloud
-            userAnimal.setPhotoUrl(request.getPhotoUrl().getOriginalFilename());
+        // Verificar no està ja desbloquejat
+        if (userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId()).isPresent()) {
+            throw new AnimalAlreadyUnlockedException("L'animal ja està bloquejat...");
         }
 
-        return userAnimalRepository.save(userAnimal);
+        // Crear UserAnimal
+        UserAnimal userAnimal = UserAnimal.builder()
+                .userId(userId)
+                .animalId(animal.getId())
+                .status(AnimalStatus.UNLOCK)
+                .build();
+
+        UserAnimal savedUserAnimal = userAnimalRepository.save(userAnimal);
+
+        // Guardar foto real
+        UserAnimalPhoto unlockPhoto = fileStorageService.storeFile(request.getFile(), request.getDescription(), savedUserAnimal.getId());
+        UserAnimalPhoto savedPhoto = userAnimalPhotoRepository.save(unlockPhoto);
+        savedUserAnimal.addPhoto(savedPhoto);
+
+        return userAnimalMapper.toDto(savedUserAnimal);
+    }
+
+    public UserAnimalDto addPhoto(Long userId, Long animalId, MultipartFile file, String description) {
+        // 1. Verificar que l'usuari té l'animal desbloquejat
+        UserAnimal userAnimal = userAnimalRepository.findByUserIdAndAnimalId(userId, animalId)
+                .orElseThrow(() -> new UserAnimalNotFoundException("Aquest usuari no té aquest animal..."));
+
+        // 2. Verificar que està desbloquejat
+        if (userAnimal.getStatus() != AnimalStatus.UNLOCK) {
+            throw new AnimalNotUnlockedException("Aquest animal no està desbloquejat...");
+        }
+
+        // 3. Guardar la foto al sistema de fitxers
+        UserAnimalPhoto photo = fileStorageService.storeFile(file, description, userAnimal.getId());
+
+        // 4. Guardar la foto a la base de dades
+        UserAnimalPhoto savedPhoto = userAnimalPhotoRepository.save(photo);
+
+        // 5. Afegir la foto a la llista de l'usuari
+        userAnimal.addPhoto(savedPhoto);
+
+        // 6. Retornar DTO actualitzat
+        return userAnimalMapper.toDto(userAnimal);
+    }
+
+    // Obtenir tots els animals desbloquejats d'un usuari amb fotos
+    public List<UserAnimal> findUnlockedAnimalsWithPhotos(Long userId) {
+        return userAnimalRepository.findUnlockedByUserIdWithPhotos(userId);
+    }
+
+
+    // Obtenir una foto específica amb verificació de propietari
+    public UserAnimalPhoto getPhoto(Long userId, Long photoId) {
+        UserAnimalPhoto photo = userAnimalPhotoRepository.findById(photoId)
+                .orElseThrow(() -> new PhotoNotFoundException(photoId));
+
+        // Verificar que l'usuari és el propietari
+        if (!userAnimalPhotoRepository.existsByIdAndUserId(photoId, userId)) {
+            throw new UnauthorizedPhotoAccessException(photoId);
+        }
+
+        return photo;
+    }
+
+    // Estadístiques de l'usuari
+    public UserAnimalStats getStats(Long userId) {
+        long totalUnlocked = userAnimalRepository.countByUserIdAndStatus(userId, AnimalStatus.UNLOCK);
+        long totalPhotos = userAnimalPhotoRepository.countByUserId(userId);
+
+        return UserAnimalStats.builder()
+                .totalUnlockedAnimals(totalUnlocked)
+                .totalPhotos(totalPhotos)
+                .build();
+    }
+
+    // Obtenir les fotos d'un animal
+    public List<UserAnimalPhoto> getAnimalPhotos(Long userId, Long animalId) {
+        return userAnimalPhotoRepository.findByUserIdAndAnimalId(userId, animalId);
     }
 
     public List<UserAnimal> getUserAnimals(Long userId) {

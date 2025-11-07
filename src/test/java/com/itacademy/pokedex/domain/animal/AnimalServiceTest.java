@@ -8,7 +8,7 @@ import com.itacademy.pokedex.domain.animal.mapper.AnimalMapper;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.animal.service.AnimalService;
-import com.itacademy.pokedex.domain.useranimal.modelo.AnimalStatus;
+import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 import java.util.List;
-import java.util.function.IntPredicate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;

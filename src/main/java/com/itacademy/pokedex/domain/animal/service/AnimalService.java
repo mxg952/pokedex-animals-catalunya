@@ -5,14 +5,9 @@ import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
 import com.itacademy.pokedex.domain.animal.mapper.AnimalMapper;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
-import com.itacademy.pokedex.domain.useranimal.modelo.AnimalStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import org.springframework.stereotype.Service;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
