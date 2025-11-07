@@ -1,5 +1,6 @@
 package com.itacademy.pokedex.domain.user.controller;
 
+import com.itacademy.pokedex.domain.user.dto.LoginRequest;
 import com.itacademy.pokedex.domain.user.dto.RegisterRequest;
 import com.itacademy.pokedex.domain.user.service.UserService;
 import com.itacademy.pokedex.security.dto.JwtResponse;
@@ -21,13 +22,20 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<JwtResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userService.register(request));
-
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+        userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Usuari registrat correctament");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest request) {
+        JwtResponse jwt = userService.login(request);
+        return ResponseEntity.ok(jwt);
+    }
+
+
 
 
 }

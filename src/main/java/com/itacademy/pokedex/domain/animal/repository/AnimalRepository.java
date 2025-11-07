@@ -1,5 +1,6 @@
 package com.itacademy.pokedex.domain.animal.repository;
 
+import com.itacademy.pokedex.domain.animal.dto.AnimalDto;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.useranimal.modelo.entity.UserAnimal;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,8 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
-    Optional<Animal> findByCommonName(String nomColoquial);
+    Optional<Animal> findByCommonName(String commonName);
     List<UserAnimal> findByUserId(Long userId);
+    List<Animal> findByCommonNameContainingIgnoreCase(String commonName);
 
 
 }
