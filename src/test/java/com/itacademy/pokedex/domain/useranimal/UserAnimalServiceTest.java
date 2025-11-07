@@ -6,8 +6,6 @@ import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.useranimal.dto.UnlockAnimalRequest;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
-import com.itacademy.pokedex.domain.useranimal.exception.AnimalAlreadyUnlockedException;
-import com.itacademy.pokedex.domain.useranimal.exception.InvalidFileException;
 import com.itacademy.pokedex.domain.useranimal.mapper.UserAnimalMapper;
 import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimal;
@@ -23,13 +21,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserAnimalServiceTest {

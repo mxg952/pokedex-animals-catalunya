@@ -74,16 +74,31 @@ public class UserAnimalService {
             throw new AnimalNotUnlockedException("Aquest animal no està desbloquejat...");
         }
 
-        // 3. Guardar la foto al sistema de fitxers
+        // ✅ 3. VALIDAR que el fitxer no és null
+        if (file == null) {
+            throw new InvalidFileException("La foto és obligatòria");
+        }
+
+        // ✅ 4. VALIDAR que el fitxer no està buit
+        if (file.isEmpty()) {
+            throw new InvalidFileException("La foto no pot estar buida");
+        }
+
+        // ✅ 5. VALIDAR que és una imatge
+        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+            throw new InvalidFileException("Només es permeten arxius d'imatge (JPEG, PNG, etc.)");
+        }
+
+        // 6. Guardar la foto al sistema de fitxers
         UserAnimalPhoto photo = fileStorageService.storeFile(file, description, userAnimal.getId());
 
-        // 4. Guardar la foto a la base de dades
+        // 7. Guardar la foto a la base de dades
         UserAnimalPhoto savedPhoto = userAnimalPhotoRepository.save(photo);
 
-        // 5. Afegir la foto a la llista de l'usuari
+        // 8. Afegir la foto a la llista de l'usuari
         userAnimal.addPhoto(savedPhoto);
 
-        // 6. Retornar DTO actualitzat
+        // 9. Retornar DTO actualitzat
         return userAnimalMapper.toDto(userAnimal);
     }
 
