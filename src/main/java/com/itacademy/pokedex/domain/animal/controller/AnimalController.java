@@ -18,7 +18,7 @@ public class AnimalController {
 
  private final AnimalService animalService;
 
-    @GetMapping
+    @GetMapping("/get")
     public ResponseEntity<List<Animal>> getAllAnimals() {
         return  ResponseEntity
                 .status(HttpStatus.ACCEPTED)

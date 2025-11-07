@@ -26,5 +26,5 @@ public class UserAnimal {
     @Enumerated(EnumType.STRING)
     private AnimalStatus status;  // BLOCKED or UNLOCKED
 
-    private String photoUrl;  // URL or filename of the uploaded photo
+    private List<> photoUrl;  // URL or filename of the uploaded photo
 }
