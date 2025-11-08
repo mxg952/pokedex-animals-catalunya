@@ -5,8 +5,10 @@ import com.itacademy.pokedex.domain.user.repository.UserRepository;
 import com.itacademy.pokedex.domain.user.service.UserService;
 import com.itacademy.pokedex.security.service.JwtService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -14,6 +16,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class UserLogoutTest {
 
     @Mock
@@ -40,8 +43,6 @@ public class UserLogoutTest {
         String authHeader = "Bearer valid.jwt.token";
         String cleanToken = "valid.jwt.token";
 
-        when(jwtService.extractUsername(cleanToken)).thenReturn("marc");
-
         // When
         userService.logout(authHeader);
 
@@ -53,8 +54,6 @@ public class UserLogoutTest {
     void givenTokenWithoutBearerPrefix_whenLogout_thenTokenIsInvalidated() {
         // Given
         String token = "raw.jwt.token";
-
-        when(jwtService.extractUsername(token)).thenReturn("marc");
 
         // When
         userService.logout(token);
@@ -83,9 +82,6 @@ public class UserLogoutTest {
     void givenInvalidToken_whenLogout_thenDoNotThrow() {
         // Given
         String invalidToken = "Bearer invalid.token";
-
-        when(jwtService.extractUsername("invalid.token"))
-                .thenThrow(new RuntimeException("Token invàlid"));
 
         // When & Then - No hauria de llençar excepció
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> {
