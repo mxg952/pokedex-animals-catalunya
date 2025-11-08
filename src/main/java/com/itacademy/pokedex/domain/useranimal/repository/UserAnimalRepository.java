@@ -17,6 +17,7 @@ public interface UserAnimalRepository extends JpaRepository<UserAnimal, Long> {
     // Trobar tots els animals d'un usuari
     List<UserAnimal> findByUserId(Long userId);
 
+
     // Trobar animals d'un usuari per estat
     List<UserAnimal> findByUserIdAndStatus(Long userId, AnimalStatus status);
 

@@ -138,6 +138,6 @@ public class UserAnimalService {
     }
 
     public List<UserAnimal> getUserAnimals(Long userId) {
-        return animalRepository.findByUserId(userId);
+        return userAnimalRepository.findByUserId(userId);
     }
 }

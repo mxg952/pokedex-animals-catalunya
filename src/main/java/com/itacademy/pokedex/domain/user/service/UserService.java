@@ -27,7 +27,7 @@ public class UserService {
 
 
     public JwtResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getName())) {
+        if (userRepository.existsByName(request.getName())) {
             throw new UserNameAlreadyExistsException(request.getName());
         }
         User user = registerMapper.toEntity(request, encoder);

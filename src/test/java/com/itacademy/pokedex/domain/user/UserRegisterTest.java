@@ -68,7 +68,7 @@ public class UserRegisterTest {
     void givenExistingUsername_whenRegister_thenThrowException() {
         RegisterRequest request = new RegisterRequest("marc", "12345");
 
-        when(userRepository.existsByUsername("marc")).thenReturn(true);
+        when(userRepository.existsByName("marc")).thenReturn(true);
 
         assertThatThrownBy(() -> userService.register(request))
                 .isInstanceOf(UserNameAlreadyExistsException.class)
