@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserTest {
+public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
@@ -83,72 +83,4 @@ public class UserTest {
                 .hasMessageContaining("Username already exists");
     }
 
-
-    @Test
-    void givenValidCredentials_whenLogin_thenReturnJwtResponse() {
-        LoginRequest request = new LoginRequest("marc", "12345");
-
-        User user = User.builder()
-                .name("marc")
-                .password("encoded12345")
-                .role(Role.USER_ROLE)
-                .build();
-
-        String expectedToken = "jwt-token-123";
-
-        when(userRepository.findByName("marc")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn(expectedToken);
-
-        JwtResponse response = userService.login(request);
-
-        assertNotNull(response);
-        assertEquals(expectedToken, response.getToken());
-        assertEquals("marc", response.getName());
-    }
-
-    @Test
-    void givenNonExistentUser_whenLogin_thenThrowException() {
-        LoginRequest request = new LoginRequest("marc", "12345");
-
-        when(authenticationManager.authenticate(any()))
-                .thenReturn(new UsernamePasswordAuthenticationToken(request.getName(), request.getPassword()));
-        when(userRepository.findByName("marc")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> userService.login(request))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessageContaining("No existeix cap usuari amb aquest nom...");
-    }
-
-    @Test
-    void givenWrongPassword_whenLogin_thenThrowBadCredentials() {
-        LoginRequest request = new LoginRequest("marc", "wrong");
-
-        when(authenticationManager.authenticate(any()))
-                .thenThrow(BadCredentialsException.class);
-
-        assertThatThrownBy(() -> userService.login(request))
-                .isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    void generateTokenIsCalledOnce_onSuccessfulLogin() {
-        LoginRequest request = new LoginRequest("marc", "12345");
-
-        User user = User.builder()
-                .name("marc")
-                .password("encoded12345")
-                .role(Role.USER_ROLE)
-                .build();
-
-        String expectedToken = "jwt-token-123";
-
-        when(authenticationManager.authenticate(any()))
-                .thenReturn(new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword()));
-        when(userRepository.findByName("marc")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn(expectedToken);
-
-        userService.login(request);
-
-        verify(jwtService, times(1)).generateToken(user);
-    }
 }

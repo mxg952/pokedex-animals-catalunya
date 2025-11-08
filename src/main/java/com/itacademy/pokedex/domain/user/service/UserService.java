@@ -9,11 +9,13 @@ import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.repository.UserRepository;
 import com.itacademy.pokedex.security.dto.JwtResponse;
 import com.itacademy.pokedex.security.service.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -56,6 +58,32 @@ public class UserService {
                 .token(token)
                 .name(user.getName())
                 .build();
+    }
+
+    public void logout(String authHeader) {
+        if (authHeader == null || authHeader.isBlank()) {
+            throw new IllegalArgumentException("Token no proporcionat");
+        }
+
+        String token = authHeader;
+
+        // Netejar el prefix "Bearer " si existeix
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        // Invalidar el token encara que sigui invàlid o expirat
+        // Això evita que pugui ser reutilitzat
+        try {
+            // Verificar que el token té un format bàsicament correcte
+            if (!token.isBlank()) {
+                jwtService.invalidateToken(token);
+                log.info("Token invalidat per logout");
+            }
+        } catch (Exception e) {
+            log.warn("Error durant invalidació de token: {}", e.getMessage());
+            // No llençar l'excepció per no revelar informació
+        }
     }
 
 }

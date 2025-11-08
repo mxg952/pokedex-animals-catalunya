@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @Service
@@ -24,6 +27,9 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+
+    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
+
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
@@ -56,7 +62,9 @@ public class JwtService {
     // 🔹 Validar token
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (username.equals(userDetails.getUsername()))
+                && !isTokenExpired(token)
+                && !isTokenInvalidated(token); // ← Nova comprovació
     }
 
     private boolean isTokenExpired(String token) {
@@ -79,4 +87,24 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public void invalidateToken(String token) {
+        invalidatedTokens.add(token);
+    }
+
+    private boolean isTokenInvalidated(String token) {
+        return invalidatedTokens.contains(token);
+    }
+
+    @Scheduled(fixedRate = 3600000) // Cada hora
+    public void cleanupExpiredTokens() {
+        invalidatedTokens.removeIf(token -> {
+            try {
+                return isTokenExpired(token);
+            } catch (Exception e) {
+                return true; // Si hi ha error, eliminar el token
+            }
+        });
+    }
+
 }

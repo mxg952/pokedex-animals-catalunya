@@ -43,4 +43,22 @@ public class  GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse("Error inesperat", LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        // Personalitzar missatge per a errors de logout
+        if (ex.getMessage().contains("Token no proporcionat")) {
+            return new ResponseEntity<>(
+                    new ErrorResponse("Token d'autenticació requerit", LocalDateTime.now()),
+                    status
+            );
+        }
+
+        return new ResponseEntity<>(
+                new ErrorResponse(ex.getMessage(), LocalDateTime.now()),
+                status
+        );
+    }
 }
