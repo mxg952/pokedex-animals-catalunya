@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserAnimalService {
@@ -44,7 +45,7 @@ public class UserAnimalService {
 
         // Verificar no està ja desbloquejat
         if (userAnimalRepository.findByUserIdAndAnimalId(userId, animal.getId()).isPresent()) {
-            throw new AnimalAlreadyUnlockedException("L'animal ja està bloquejat...");
+            throw new AnimalAlreadyUnlockedException("L'animal ja està desbloquejat...");
         }
 
         // Crear UserAnimal
@@ -61,7 +62,11 @@ public class UserAnimalService {
         UserAnimalPhoto savedPhoto = userAnimalPhotoRepository.save(unlockPhoto);
         savedUserAnimal.addPhoto(savedPhoto);
 
-        return userAnimalMapper.toDto(savedUserAnimal);
+        Animal animalComplet = animalRepository.findById(animal.getId())
+                .orElseThrow(() -> new AnimalNotFoundException("Animal no trobat"));
+
+        // ✅ I passar animalComplet al mapper:
+        return userAnimalMapper.toDto(savedUserAnimal, animalComplet);
     }
 
     public UserAnimalDto addPhoto(Long userId, Long animalId, MultipartFile file, String description) {
@@ -137,7 +142,15 @@ public class UserAnimalService {
         return userAnimalPhotoRepository.findByUserIdAndAnimalId(userId, animalId);
     }
 
-    public List<UserAnimal> getUserAnimals(Long userId) {
-        return userAnimalRepository.findByUserId(userId);
+    public List<UserAnimalDto> getUserAnimals(Long userId) {
+        List<UserAnimal> userAnimals = userAnimalRepository.findByUserId(userId);
+
+        return userAnimals.stream()
+                .map(userAnimal -> {
+                    // ✅ Carregar l'animal per a cada UserAnimal
+                    Animal animal = animalRepository.findById(userAnimal.getAnimalId()).orElse(null);
+                    return userAnimalMapper.toDto(userAnimal, animal);
+                })
+                .collect(Collectors.toList());
     }
 }

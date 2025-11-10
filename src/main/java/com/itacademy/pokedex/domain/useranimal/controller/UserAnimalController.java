@@ -32,8 +32,8 @@ public class UserAnimalController {
     private final UserAnimalService userAnimalService;
     private final FileStorageService fileStorageService;
 
- @PostMapping("/unlock")
-    public ResponseEntity<UserAnimalDto> unlockAnimal(@Valid @RequestBody UnlockAnimalRequest unlockAnimalRequest,
+ @PostMapping(value = "/unlock", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserAnimalDto> unlockAnimal(@Valid @ModelAttribute UnlockAnimalRequest unlockAnimalRequest,
                                                    @AuthenticationPrincipal UserDetails userDetails) {
      Long userId = ((User) userDetails).getId();
         return ResponseEntity
@@ -43,7 +43,7 @@ public class UserAnimalController {
 
 
     @GetMapping("/get")
-    public ResponseEntity<List<UserAnimal>> getUserAnimals(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<UserAnimalDto>> getUserAnimals(@AuthenticationPrincipal UserDetails userDetails) {
         Long userId = ((User) userDetails).getId();
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

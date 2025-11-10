@@ -18,7 +18,7 @@ public class UserAnimalMapper {
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
 
-    public UserAnimalDto toDto(UserAnimal userAnimal) {
+    public UserAnimalDto toDto(UserAnimal userAnimal, Animal animal) {
         if (userAnimal == null) {
             return null;
         }
@@ -42,13 +42,16 @@ public class UserAnimalMapper {
                 .photos(photoDtos)
                 .totalPhotos(photoDtos.size());
 
-        // Afegir informació de l'animal si està disponible
-        if (userAnimal.getAnimal() != null) {
-            Animal animal = userAnimal.getAnimal();
+        // ✅ OMPLIR les dades de l'animal (ara sí que les tenim!)
+        if (animal != null) {
             builder.animalCommonName(animal.getCommonName())
                     .animalScientificName(animal.getScientificName())
                     .animalCategory(animal.getCategory())
-                    .animalDefaultPhotoUrl(animal.getPhotoUnlockUrl());
+                    .animalDefaultPhotoUrl(animal.getPhotoUnlockUrl())
+                    .displayName(animal.getCommonName());  // Això evitarà "Animal 2"
+        } else {
+            // ✅ Fallback si no hi ha animal
+            builder.displayName("Animal " + userAnimal.getAnimalId());
         }
 
         // Format de data per al frontend
@@ -57,7 +60,19 @@ public class UserAnimalMapper {
                     .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         }
 
+        // ✅ Main photo URL
+        if (!photoDtos.isEmpty()) {
+            builder.mainPhotoUrl(photoDtos.get(0).getFileName());
+        } else if (animal != null && animal.getPhotoUnlockUrl() != null) {
+            builder.mainPhotoUrl(animal.getPhotoUnlockUrl());
+        }
+
         return builder.build();
+    }
+
+    // ✅ Manté el mètode original per compatibilitat
+    public UserAnimalDto toDto(UserAnimal userAnimal) {
+        return toDto(userAnimal, null);  // Crida el nou mètode sense animal
     }
 
     public UserAnimalPhotoDto toPhotoDto(UserAnimalPhoto photo) {

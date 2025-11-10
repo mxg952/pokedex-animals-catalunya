@@ -34,13 +34,12 @@ public class AnimalController {
             @RequestParam String name,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        Long userId = ((User) userDetails).getId();
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
+        Long userId = ((User) userDetails).getId();
         return ResponseEntity.ok(animalService.searchAnimal(name, userId));
     }
-
-
-
-
 
 }

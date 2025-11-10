@@ -38,6 +38,9 @@ public class UserAnimalDto {
     // Estadístiques (calculades)
     private Integer totalPhotos;
     private String firstUnlockDate; // Data en format string per al frontend
+    private String displayName;
+    private Boolean unlocked;
+    private String mainPhotoUrl;
 
     // Mètodes helpers
     public boolean isUnlocked() {

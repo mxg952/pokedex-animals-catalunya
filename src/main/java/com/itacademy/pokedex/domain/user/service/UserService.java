@@ -9,6 +9,7 @@ import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.repository.UserRepository;
 import com.itacademy.pokedex.security.dto.JwtResponse;
 import com.itacademy.pokedex.security.service.JwtService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,12 +20,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-    private RegisterMapper registerMapper;
-    private PasswordEncoder encoder;
-    private JwtService jwtService;
-    private AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final RegisterMapper registerMapper;
+    private final PasswordEncoder encoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
+    public UserService(UserRepository userRepository, RegisterMapper registerMapper,
+                       PasswordEncoder encoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.registerMapper = registerMapper;
+        this.encoder = encoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     public JwtResponse register(RegisterRequest request) {
         if (userRepository.existsByName(request.getName())) {

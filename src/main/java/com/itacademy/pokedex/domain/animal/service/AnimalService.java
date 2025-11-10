@@ -40,11 +40,12 @@ public class AnimalService {
 
         return animals.stream()
                 .map(animal -> {
-                    boolean unlocked = userAnimalRepository
-                            .existsByUserIdAndAnimalIdAndStatus(userId, animal.getId(), AnimalStatus.UNLOCK);
-                    return unlocked
-                            ? animalMapper.toUnlockDto(animal) // informació completa
-                            : animalMapper.toLockDto(animal); // informació parcial
+                    // Si no hi ha userId, retorna info bloquejada
+                    if (userId == null || !userAnimalRepository.existsByUserIdAndAnimalIdAndStatus(userId, animal.getId(), AnimalStatus.UNLOCK)) {
+                        return animalMapper.toLockDto(animal);
+                    } else {
+                        return animalMapper.toUnlockDto(animal);
+                    }
                 })
                 .collect(Collectors.toList());
     }
