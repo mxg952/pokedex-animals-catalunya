@@ -27,8 +27,8 @@ public class Animal {
     private String shortDescription;     // Brief description of the animal
     private String locationDescription;  // Description of the habitat/location
     private String mapUrl;
-    private String photoLockUrl;
-    private String photoUnlockUrl;
+    private String photoLockFileName;
+    private String photoUnlockFileName;
 }
 
 

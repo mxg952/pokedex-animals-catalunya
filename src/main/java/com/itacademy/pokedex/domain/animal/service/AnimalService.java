@@ -49,4 +49,10 @@ public class AnimalService {
                 })
                 .collect(Collectors.toList());
     }
+    public Animal getAnimalById(Long id) {
+        return animalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Animal no trobat amb ID: " + id));
+    }
+
+
 }

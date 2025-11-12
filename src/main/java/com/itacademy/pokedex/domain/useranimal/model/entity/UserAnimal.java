@@ -140,8 +140,8 @@ public class UserAnimal {
         if (hasPhotos()) {
             return getFirstPhoto().getFileName();
         }
-        if (animal != null && animal.getPhotoUnlockUrl() != null) {
-            return animal.getPhotoUnlockUrl();
+        if (animal != null && animal.getPhotoUnlockFileName() != null) {
+            return animal.getPhotoUnlockFileName();
         }
         return customPhotoUrl;
     }

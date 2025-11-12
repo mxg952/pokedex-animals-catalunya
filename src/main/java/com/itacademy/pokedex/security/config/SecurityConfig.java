@@ -1,7 +1,6 @@
 package com.itacademy.pokedex.security.config;
 
 import com.itacademy.pokedex.security.filter.JwtAuthenticationFilter;
-import com.itacademy.pokedex.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers("/api/animals/get").permitAll()
+                        .requestMatchers("/api/images/**").permitAll()  // ✅ AÑADE ESTA LÍNEA
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

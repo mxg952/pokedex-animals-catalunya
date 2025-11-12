@@ -3,7 +3,9 @@ package com.itacademy.pokedex.domain.useranimal.controller;
 
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.useranimal.dto.UnlockAnimalRequest;
+import com.itacademy.pokedex.domain.useranimal.dto.UpdatePhotoRequest;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
+import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalPhotoDto;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimal;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.service.FileStorageService;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,5 +79,28 @@ public class UserAnimalController {
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + photo.getOriginalFileName() + "\"")
                 .body(file);
+    }
+
+    @DeleteMapping("/photos/{photoId}")
+    public ResponseEntity<Map<String, String>> deletePhoto(
+            @PathVariable Long photoId,
+            @AuthenticationPrincipal User user) {
+
+        userAnimalService.deletePhoto(user.getId(), photoId);
+        return ResponseEntity.ok(Map.of(
+                "message", "Foto eliminada correctament",
+                "success", "true"
+        ));
+    }
+
+    @PutMapping("/photos/{photoId}")
+    public ResponseEntity<UserAnimalPhotoDto> updatePhoto(
+            @PathVariable Long photoId,
+            @RequestBody UpdatePhotoRequest request,
+            @AuthenticationPrincipal User user) {
+
+        UserAnimalPhotoDto updatedPhoto = userAnimalService.updatePhoto(
+                user.getId(), photoId, request.getDescription());
+        return ResponseEntity.ok(updatedPhoto);
     }
 }

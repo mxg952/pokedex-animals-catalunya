@@ -4,13 +4,23 @@ import com.itacademy.pokedex.domain.animal.dto.AnimalLockDto;
 import com.itacademy.pokedex.domain.animal.dto.AnimalUnlockDto;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class AnimalMapper {
 
+    @Value("${app.base-url:http://localhost:8080}")
+    private String baseUrl;
+
     public AnimalUnlockDto toUnlockDto(Animal animal) {
+        // ✅ GENERA la URL completa abans del return
+        String unlockImageUrl = baseUrl + "/api/images/animals/unlocked/" +
+                (animal.getPhotoUnlockFileName() != null ? animal.getPhotoUnlockFileName() : "default_animal.jpg");
+
+        log.debug("🔧 Generant URL imatge desbloquejada: {}", unlockImageUrl);
+
         return AnimalUnlockDto.builder()
                 .commonName(animal.getCommonName())
                 .scientificName(animal.getScientificName())
@@ -20,18 +30,33 @@ public class AnimalMapper {
                 .shortDescription(animal.getShortDescription())
                 .locationDescription(animal.getLocationDescription())
                 .mapUrl(animal.getMapUrl())
-                .photoUnlockUrl(animal.getPhotoUnlockUrl())
+                .photoUnlockUrl(unlockImageUrl)  // ✅ URL CORRECTA
                 .build();
     }
 
     public AnimalLockDto toLockDto(Animal animal) {
+        String lockImageUrl = baseUrl + "/api/images/animals/locked/" +
+                (animal.getPhotoLockFileName() != null ? animal.getPhotoLockFileName() : "default_silhouette.png");
+
+        String unlockImageUrl = baseUrl + "/api/images/animals/unlocked/" +
+                (animal.getPhotoUnlockFileName() != null ? animal.getPhotoUnlockFileName() : "default_animal.jpg");
+
+        log.debug("🔧 Generant URLs per animal {}: locked={}, unlocked={}",
+                animal.getId(), lockImageUrl, unlockImageUrl);
+
         return AnimalLockDto.builder()
+                .id(animal.getId())
                 .commonName(animal.getCommonName())
                 .scientificName(animal.getScientificName())
+                .category(animal.getCategory())                    // ✅
+                .visibilityProbability(animal.getVisibilityProbability()) // ✅
                 .sightingMonths(animal.getSightingMonths())
+                .shortDescription(animal.getShortDescription())    // ✅
                 .locationDescription(animal.getLocationDescription())
                 .mapUrl(animal.getMapUrl())
-                .photoLockUrl(animal.getPhotoLockUrl())
+                .photoLockUrl(lockImageUrl)
+                .photoUnlockUrl(unlockImageUrl)                    // ✅
+                .isLocked(true)                                    // ✅ SEMPRE bloquejat en aquest DTO
                 .message("Desbloqueja per obtenir més informació!")
                 .build();
     }

@@ -39,10 +39,13 @@ public class UserAnimalDto {
     private Integer totalPhotos;
     private String firstUnlockDate; // Data en format string per al frontend
     private String displayName;
-    private Boolean unlocked;
+
+    // ✅ CORREGIR: Cambiar Boolean por boolean o calcularlo correctamente
+    private boolean unlocked; // ← CAMBIAR de Boolean a boolean
+
     private String mainPhotoUrl;
 
-    // Mètodes helpers
+    // ✅ MÉTODO CORREGIDO: Asegurar que se llama en el mapper
     public boolean isUnlocked() {
         return status == AnimalStatus.UNLOCK;
     }
@@ -55,8 +58,6 @@ public class UserAnimalDto {
         return animalCommonName != null ? animalCommonName : "Animal " + animalId;
     }
 
-
-    // Mètode per obtenir la foto principal (primera foto de l'usuari o la per defecte)
     public String getMainPhotoUrl() {
         if (hasPhotos()) {
             return photos.get(0).getFileName();

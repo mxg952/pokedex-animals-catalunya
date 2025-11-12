@@ -12,12 +12,17 @@ import java.util.List;
 @Builder
 @Data
 public class AnimalLockDto implements AnimalDto {
-    private String commonName;           // Nom coloquial
-    private String scientificName;       // Nom científic
-    private List<String> sightingMonths; // Months of the year when it is usually seen
-    private String locationDescription;  // Description of the habitat/location
+    private Long id;
+    private String commonName;
+    private String scientificName;
+    private String category;              // ✅ AFEGEIX
+    private String visibilityProbability; // ✅ AFEGEIX
+    private List<String> sightingMonths;
+    private String shortDescription;      // ✅ AFEGEIX
+    private String locationDescription;
     private String mapUrl;
     private String photoLockUrl;
+    private String photoUnlockUrl;        // ✅ AFEGEIX (per al visualitzador)
     private String message;
-
+    private Boolean isLocked;             // ✅ AFEGEIX (calculat)
 }

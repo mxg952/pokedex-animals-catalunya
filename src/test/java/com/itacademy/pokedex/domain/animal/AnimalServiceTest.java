@@ -71,8 +71,8 @@ public class AnimalServiceTest {
         animal.setShortDescription("Gran felino africano");
         animal.setLocationDescription("Sabana africana");
         animal.setMapUrl("http://map.example.com");
-        animal.setPhotoUnlockUrl("http://photo-unlock.jpg");
-        animal.setPhotoLockUrl("http://photo-lock.jpg");
+        animal.setPhotoUnlockFileName("http://photo-unlock.jpg");
+        animal.setPhotoLockFileName("http://photo-lock.jpg");
 
         // Crea los DTOs que el mapper debería retornar
         AnimalUnlockDto unlockDto = AnimalUnlockDto.builder()
@@ -122,8 +122,8 @@ public class AnimalServiceTest {
         animal.setShortDescription("Gran felino africano");
         animal.setLocationDescription("Sabana africana");
         animal.setMapUrl("http://map.example.com");
-        animal.setPhotoUnlockUrl("http://photo-unlock.jpg");
-        animal.setPhotoLockUrl("http://photo-lock.jpg");
+        animal.setPhotoUnlockFileName("http://photo-unlock.jpg");
+        animal.setPhotoLockFileName("http://photo-lock.jpg");
 
         AnimalLockDto animalLockDto = new AnimalLockDto();
         animalLockDto.setCommonName("Lleó");

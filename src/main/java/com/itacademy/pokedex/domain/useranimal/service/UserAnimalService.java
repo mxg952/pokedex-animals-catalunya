@@ -5,6 +5,7 @@ import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.useranimal.dto.UnlockAnimalRequest;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
+import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalPhotoDto;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalStats;
 import com.itacademy.pokedex.domain.useranimal.exception.*;
 import com.itacademy.pokedex.domain.useranimal.mapper.UserAnimalMapper;
@@ -14,6 +15,8 @@ import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
 import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
+import io.jsonwebtoken.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +24,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserAnimalService {
 
@@ -137,6 +141,31 @@ public class UserAnimalService {
                 .build();
     }
 
+    public void deletePhoto(Long userId, Long photoId) {
+        log.info("Eliminant foto {} de l'usuari {}", photoId, userId);
+
+        // 1. Verificar que la foto existeix i l'usuari és propietari
+        UserAnimalPhoto photo = userAnimalPhotoRepository.findById(photoId)
+                .orElseThrow(() -> new PhotoNotFoundException(photoId));
+
+        if (!userAnimalPhotoRepository.existsByIdAndUserId(photoId, userId)) {
+            throw new UnauthorizedPhotoAccessException(photoId);
+        }
+
+        // 2. Eliminar fitxer físic
+        try {
+            fileStorageService.deleteFile(photo.getFileName());
+        } catch (IOException e) {
+            log.warn("No s'ha pogut eliminar el fitxer físic: {}", photo.getFileName());
+        } catch (java.io.IOException e) {
+            throw new RuntimeException(e);
+        }
+        // 3. Eliminar de la base de dades
+        userAnimalPhotoRepository.delete(photo);
+
+        log.info("Foto {} eliminada correctament", photoId);
+    }
+
     // Obtenir les fotos d'un animal
     public List<UserAnimalPhoto> getAnimalPhotos(Long userId, Long animalId) {
         return userAnimalPhotoRepository.findByUserIdAndAnimalId(userId, animalId);
@@ -152,5 +181,26 @@ public class UserAnimalService {
                     return userAnimalMapper.toDto(userAnimal, animal);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public UserAnimalPhotoDto updatePhoto(Long userId, Long photoId, String newDescription) {
+        log.info("Actualitzant foto {} de l'usuari {}", photoId, userId);
+
+        // 1. Verificar que la foto existeix i l'usuari és propietari
+        UserAnimalPhoto photo = userAnimalPhotoRepository.findById(photoId)
+                .orElseThrow(() -> new PhotoNotFoundException(photoId));
+
+        if (!userAnimalPhotoRepository.existsByIdAndUserId(photoId, userId)) {
+            throw new UnauthorizedPhotoAccessException(photoId);
+        }
+
+        // 2. Actualizar descripció
+        photo.setDescription(newDescription);
+        UserAnimalPhoto updatedPhoto = userAnimalPhotoRepository.save(photo);
+
+        log.info("Foto {} actualitzada correctament", photoId);
+
+        // 3. Retornar DTO actualitzat
+        return userAnimalMapper.toPhotoDto(updatedPhoto);
     }
 }
