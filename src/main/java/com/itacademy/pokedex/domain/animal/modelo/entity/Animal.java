@@ -23,8 +23,12 @@ public class Animal {
     private String scientificName;       // Nom científic
     private String category;             // Category (mammal, bird, reptile, etc.)
     private String visibilityProbability; // Probability of sighting (low, normal, high)
-    private List<String> sightingMonths; // Months of the year when it is usually seen
-    private String shortDescription;     // Brief description of the animal
+    private List<String> sightingMonths;// Months of the year when it is usually seen
+
+    @Column(columnDefinition = "TEXT") // Brief description of the animal
+    private String shortDescription;
+
+    @Column(columnDefinition = "TEXT")
     private String locationDescription;  // Description of the habitat/location
     private String mapUrl;
     private String photoLockFileName;

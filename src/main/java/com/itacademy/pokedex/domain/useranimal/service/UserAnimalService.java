@@ -1,5 +1,6 @@
 package com.itacademy.pokedex.domain.useranimal.service;
 
+import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
 import com.itacademy.pokedex.domain.animal.mapper.AnimalMapper;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
@@ -14,13 +15,11 @@ import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimal;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
-import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
 import io.jsonwebtoken.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -183,7 +182,7 @@ public class UserAnimalService {
                 .collect(Collectors.toList());
     }
 
-    public UserAnimalPhotoDto updatePhoto(Long userId, Long photoId, String newDescription) {
+    public UserAnimalPhotoDto updatePhoto(Long userId, Long photoId, MultipartFile file, String newDescription) {
         log.info("Actualitzant foto {} de l'usuari {}", photoId, userId);
 
         // 1. Verificar que la foto existeix i l'usuari és propietari
@@ -194,13 +193,42 @@ public class UserAnimalService {
             throw new UnauthorizedPhotoAccessException(photoId);
         }
 
-        // 2. Actualizar descripció
-        photo.setDescription(newDescription);
-        UserAnimalPhoto updatedPhoto = userAnimalPhotoRepository.save(photo);
+        // 2. Si s'ha pujat un nou fitxer, actualitzar-lo
+        if (file != null && !file.isEmpty()) {
+            log.info("Actualitzant imatge de la foto {}", photoId);
 
+            // ✅ VALIDAR que és una imatge
+            if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+                throw new InvalidFileException("Només es permeten arxius d'imatge (JPEG, PNG, etc.)");
+            }
+
+            // ✅ ELIMINAR fitxer antic
+            try {
+                fileStorageService.deleteFile(photo.getFileName());
+            } catch (Exception e) {
+                log.warn("No s'ha pogut eliminar el fitxer físic antic: {}", photo.getFileName());
+            }
+
+            // ✅ GUARDAR nou fitxer
+            UserAnimalPhoto updatedPhotoInfo = fileStorageService.storeFile(file, newDescription, photo.getUserAnimalId());
+
+            // ✅ ACTUALITZAR dades de la foto
+            photo.setFileName(updatedPhotoInfo.getFileName());
+            photo.setOriginalFileName(updatedPhotoInfo.getOriginalFileName());
+            photo.setContentType(updatedPhotoInfo.getContentType());
+            photo.setFileSize(updatedPhotoInfo.getFileSize());
+        }
+
+        // 3. Actualitzar descripció (si s'ha proporcionat)
+        if (newDescription != null) {
+            photo.setDescription(newDescription);
+        }
+
+        // 4. Guardar canvis
+        UserAnimalPhoto updatedPhoto = userAnimalPhotoRepository.save(photo);
         log.info("Foto {} actualitzada correctament", photoId);
 
-        // 3. Retornar DTO actualitzat
+        // 5. Retornar DTO actualitzat
         return userAnimalMapper.toPhotoDto(updatedPhoto);
     }
 }

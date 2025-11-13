@@ -93,14 +93,15 @@ public class UserAnimalController {
         ));
     }
 
-    @PutMapping("/photos/{photoId}")
+    @PutMapping(value = "/photos/{photoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserAnimalPhotoDto> updatePhoto(
             @PathVariable Long photoId,
-            @RequestBody UpdatePhotoRequest request,
+            @RequestParam(value = "file", required = false) MultipartFile file,  // ✅ OPCIONAL - nova imatge
+            @RequestParam(value = "description", required = false) String description,
             @AuthenticationPrincipal User user) {
 
         UserAnimalPhotoDto updatedPhoto = userAnimalService.updatePhoto(
-                user.getId(), photoId, request.getDescription());
+                user.getId(), photoId, file, description);
         return ResponseEntity.ok(updatedPhoto);
     }
 }
