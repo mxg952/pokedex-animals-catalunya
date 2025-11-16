@@ -104,4 +104,5 @@ public class UserAnimalController {
                 user.getId(), photoId, file, description);
         return ResponseEntity.ok(updatedPhoto);
     }
+
 }

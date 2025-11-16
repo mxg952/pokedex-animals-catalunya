@@ -137,7 +137,6 @@ public class FileStorageService {
                 log.warn("⚠️ El fitxer no existeix, no es pot eliminar: {}", fileName);
                 // No llençar excepció, només log warning
             }
-
         } catch (java.io.IOException e) {
             log.error("❌ Error eliminant fitxer: {}", fileName, e);
             throw new java.io.IOException("No s'ha pogut eliminar el fitxer: " + fileName, e);

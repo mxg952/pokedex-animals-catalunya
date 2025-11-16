@@ -15,5 +15,5 @@ public class AnimalRequest {
 
     @NotNull
     @Size(min = 2, max = 50, message = "Nom invàlid...")
-    private String animalNme;
+    private String animalName;
 }

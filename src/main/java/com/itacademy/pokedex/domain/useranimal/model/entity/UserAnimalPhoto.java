@@ -39,6 +39,10 @@ public class UserAnimalPhoto {
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
+    @Column(name = "status", length = 20)
+    @Builder.Default
+    private String status = "PENDING";
+
     @Column(name = "user_animal_id", nullable = false)
     private Long userAnimalId;
 
@@ -52,6 +56,21 @@ public class UserAnimalPhoto {
         if (uploadedAt == null) {
             uploadedAt = LocalDateTime.now();
         }
+        if (status == null) {
+            status = "PENDING"; // Valor per defecte
+        }
+    }
+
+    public boolean isPending() {
+        return "PENDING".equals(status);
+    }
+
+    public boolean isApproved() {
+        return "APPROVED".equals(status);
+    }
+
+    public boolean isRejected() {
+        return "REJECTED".equals(status);
     }
 
     // Mètodes helpers

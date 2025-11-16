@@ -1,21 +1,29 @@
 package com.itacademy.pokedex.domain.admin.service;
 
 import com.itacademy.pokedex.domain.admin.dto.AdminStatsDto;
+import com.itacademy.pokedex.domain.admin.dto.CreateAnimalRequest;
+import com.itacademy.pokedex.domain.admin.dto.UserInfoDto;
 import com.itacademy.pokedex.domain.admin.exception.PhotoDeletionException;
+import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
+import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
+import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.repository.UserRepository;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
 import com.itacademy.pokedex.domain.useranimal.exception.PhotoNotFoundException;
 import com.itacademy.pokedex.domain.useranimal.mapper.UserAnimalMapper;
+import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,6 +34,7 @@ public class AdminService {
     private final UserAnimalPhotoRepository userAnimalPhotoRepository;
     private final UserRepository userRepository;
     private final UserAnimalMapper userAnimalMapper;
+    private final AnimalRepository animalRepository;
 
     public AdminStatsDto getStats() {
         return AdminStatsDto.builder()
@@ -51,6 +60,48 @@ public class AdminService {
 
     private String generateTimestamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+
+    public List<UserInfoDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(user -> {
+                    Long unlockedAnimals = userAnimalRepository.countByUserIdAndStatus(
+                            user.getId(),
+                            AnimalStatus.UNLOCK
+                    );
+                    Long uploadedPhotos = userAnimalPhotoRepository.countByUserId(user.getId());
+
+                    return UserInfoDto.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .createdAt(user.getCreatedAt())
+                            .unlockedAnimals(unlockedAnimals)
+                            .uploadedPhotos(uploadedPhotos)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Animal createAnimal(CreateAnimalRequest request) {
+        Animal animal = Animal.builder()
+                .commonName(request.getCommonName())
+                .scientificName(request.getScientificName())
+                .category(request.getCategory())
+                .visibilityProbability(request.getVisibilityProbability())
+                .sightingMonths(request.getSightingMonths())
+                .shortDescription(request.getShortDescription())
+                .locationDescription(request.getLocationDescription())
+                .mapUrl(request.getMapUrl())
+                .photoLockFileName(request.getPhotoLockFileName())
+                .photoUnlockFileName(request.getPhotoUnlockFileName())
+                .build();
+
+        Animal savedAnimal = animalRepository.save(animal);
+        log.info("Nou animal creat: {} (ID: {})", savedAnimal.getCommonName(), savedAnimal.getId());
+        return savedAnimal;
     }
 
     public void deleteUserPhoto(Long photoId) {
