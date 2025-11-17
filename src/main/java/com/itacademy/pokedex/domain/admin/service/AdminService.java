@@ -15,13 +15,17 @@ import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
+import com.itacademy.pokedex.domain.useranimal.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final UserAnimalMapper userAnimalMapper;
     private final AnimalRepository animalRepository;
+    private final FileStorageService fileStorageService;
 
     public AdminStatsDto getStats() {
         return AdminStatsDto.builder()
@@ -86,22 +91,59 @@ public class AdminService {
 
     @Transactional
     public Animal createAnimal(CreateAnimalRequest request) {
-        Animal animal = Animal.builder()
-                .commonName(request.getCommonName())
-                .scientificName(request.getScientificName())
-                .category(request.getCategory())
-                .visibilityProbability(request.getVisibilityProbability())
-                .sightingMonths(request.getSightingMonths())
-                .shortDescription(request.getShortDescription())
-                .locationDescription(request.getLocationDescription())
-                .mapUrl(request.getMapUrl())
-                .photoLockFileName(request.getPhotoLockFileName())
-                .photoUnlockFileName(request.getPhotoUnlockFileName())
-                .build();
+        String lockedImageFileName = null;
+        String unlockedImageFileName = null;
 
-        Animal savedAnimal = animalRepository.save(animal);
-        log.info("Nou animal creat: {} (ID: {})", savedAnimal.getCommonName(), savedAnimal.getId());
-        return savedAnimal;
+        try {
+            // Guardar imágenes si se han proporcionado
+            if (request.getLockedImage() != null && !request.getLockedImage().isEmpty()) {
+                lockedImageFileName = fileStorageService.storeAnimalImage(request.getLockedImage(), "locked");
+            }
+
+            if (request.getUnlockedImage() != null && !request.getUnlockedImage().isEmpty()) {
+                unlockedImageFileName = fileStorageService.storeAnimalImage(request.getUnlockedImage(), "unlocked");
+            }
+
+            // Convertir sightingMonths de String a List
+            List<String> sightingMonthsList = new ArrayList<>();
+            if (request.getSightingMonths() != null && !request.getSightingMonths().trim().isEmpty()) {
+                sightingMonthsList = Arrays.stream(request.getSightingMonths().split(","))
+                        .map(String::trim)
+                        .filter(month -> !month.isEmpty())
+                        .collect(Collectors.toList());
+            }
+
+            Animal animal = Animal.builder()
+                    .commonName(request.getCommonName())
+                    .scientificName(request.getScientificName())
+                    .category(request.getCategory())
+                    .visibilityProbability(request.getVisibilityProbability())
+                    .sightingMonths(sightingMonthsList)
+                    .shortDescription(request.getShortDescription())
+                    .locationDescription(request.getLocationDescription())
+                    .mapUrl(request.getMapUrl())
+                    .photoLockFileName(lockedImageFileName)
+                    .photoUnlockFileName(unlockedImageFileName)
+                    .build();
+
+            Animal savedAnimal = animalRepository.save(animal);
+            log.info("✅ Nou animal creat: {} (ID: {})", savedAnimal.getCommonName(), savedAnimal.getId());
+
+            return savedAnimal;
+
+        } catch (Exception e) {
+            // En caso de error, limpiar archivos subidos
+            log.error("❌ Error creant animal: {}", e.getMessage(), e);
+
+            if (lockedImageFileName != null) {
+                fileStorageService.deleteAnimalImage("locked", lockedImageFileName);
+            }
+            if (unlockedImageFileName != null) {
+                fileStorageService.deleteAnimalImage("unlocked", unlockedImageFileName);
+            }
+
+            throw new RuntimeException("Error creant animal: " + e.getMessage(), e);
+        }
     }
 
     public void deleteUserPhoto(Long photoId) {

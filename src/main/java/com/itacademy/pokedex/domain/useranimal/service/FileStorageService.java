@@ -212,4 +212,38 @@ public class FileStorageService {
         }
     }
 
+    public String storeAnimalImage(MultipartFile file, String type) {
+        try {
+            if (!type.equals("locked") && !type.equals("unlocked")) {
+                log.error("❌ Tipus d'imatge no vàlid: {}", type);
+                throw new IllegalArgumentException("Tipus d'imatge no vàlid: " + type);
+            }
+
+            // ✅ Assegurar que el directori existeix
+            Path animalsPath = Paths.get(uploadDir).toAbsolutePath().resolve("animals").resolve(type);
+            Files.createDirectories(animalsPath);
+
+            // Generar nom únic
+            String originalName = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalName != null && originalName.contains(".")) {
+                fileExtension = originalName.substring(originalName.lastIndexOf("."));
+            }
+
+            String fileName = System.currentTimeMillis() + "_" +
+                    Math.abs(java.util.UUID.randomUUID().hashCode()) + fileExtension;
+
+            // Guardar arxiu
+            Path filePath = animalsPath.resolve(fileName);
+            file.transferTo(filePath.toFile());
+
+            log.info("✅ Imatge d'animal guardada: {}/{}", type, fileName);
+            return fileName;
+
+        } catch (Exception ex) {
+            log.error("❌ Error guardant imatge d'animal: {}", ex.getMessage(), ex);
+            throw new RuntimeException("Error guardant imatge d'animal: " + ex.getMessage(), ex);
+        }
+    }
+
 }
