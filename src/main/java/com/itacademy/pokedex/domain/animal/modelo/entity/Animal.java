@@ -22,14 +22,19 @@ public class Animal {
     private String commonName;           // Nom coloquial
     private String scientificName;       // Nom científic
     private String category;             // Category (mammal, bird, reptile, etc.)
-    private String visibilityProbability; // Probability of sighting (low, normal, high)
+    private String visibilityProbability;
+
+    @ElementCollection
+    @CollectionTable(name = "animal_sighting_months", joinColumns = @JoinColumn(name = "animal_id"))
+    @Column(name = "month")
     private List<String> sightingMonths;// Months of the year when it is usually seen
 
     @Column(columnDefinition = "TEXT") // Brief description of the animal
     private String shortDescription;
 
     @Column(columnDefinition = "TEXT")
-    private String locationDescription;  // Description of the habitat/location
+    private String locationDescription;//
+    // Description of the habitat/location
     private String mapUrl;
     private String photoLockFileName;
     private String photoUnlockFileName;
