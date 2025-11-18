@@ -2,7 +2,6 @@ package com.itacademy.pokedex.domain.user.mapper;
 
 import com.itacademy.pokedex.domain.user.dto.RegisterRequest;
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
-import com.itacademy.pokedex.security.dto.JwtResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,9 +18,5 @@ public class RegisterMapper {
                 .password(encoder.encode(request.getPassword()))
                 .role(USER_ROLE)
                 .build();
-    }
-
-    public JwtResponse toDto(User user, String token) {
-        return new JwtResponse(token, user.getName());
     }
 }

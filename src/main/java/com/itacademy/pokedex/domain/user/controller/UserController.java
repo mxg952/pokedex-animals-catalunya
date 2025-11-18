@@ -3,7 +3,6 @@ package com.itacademy.pokedex.domain.user.controller;
 import com.itacademy.pokedex.domain.user.dto.LoginRequest;
 import com.itacademy.pokedex.domain.user.dto.LogoutResponse;
 import com.itacademy.pokedex.domain.user.dto.RegisterRequest;
-import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.service.UserService;
 import com.itacademy.pokedex.security.dto.JwtResponse;
 import jakarta.validation.Valid;
@@ -12,9 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
