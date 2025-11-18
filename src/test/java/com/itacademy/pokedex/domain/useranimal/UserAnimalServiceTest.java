@@ -1,6 +1,5 @@
 package com.itacademy.pokedex.domain.useranimal;
 
-
 import com.itacademy.pokedex.domain.animal.exception.AnimalNotFoundException;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
@@ -52,7 +51,6 @@ class UserAnimalServiceTest {
 
     @Test
     void givenValidRequest_whenUnlockAnimal_thenReturnUserAnimalDto() {
-        // GIVEN
         Long userId = 1L;
         String commonName = "Lleó";
         Long animalId = 1L;
@@ -90,17 +88,15 @@ class UserAnimalServiceTest {
                 .status(AnimalStatus.UNLOCK)
                 .build();
 
-        // WHEN - SOLO mocks necessaris
         when(animalRepository.findByCommonName(commonName)).thenReturn(Optional.of(animal));
         when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId)).thenReturn(Optional.empty());
         when(userAnimalRepository.save(any(UserAnimal.class))).thenReturn(userAnimal);
         when(fileStorageService.storeFile(any(), any(), any())).thenReturn(photo);
         when(userAnimalPhotoRepository.save(any(UserAnimalPhoto.class))).thenReturn(photo);
-        when(userAnimalMapper.toDto(userAnimal)).thenReturn(expectedDto);
-
+        when(animalRepository.findById(animalId)).thenReturn(Optional.of(animal));
+        when(userAnimalMapper.toDto(userAnimal, animal)).thenReturn(expectedDto);
         UserAnimalDto result = userAnimalService.unlockAnimal(userId, request);
 
-        // THEN
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getStatus()).isEqualTo(AnimalStatus.UNLOCK);
@@ -108,7 +104,6 @@ class UserAnimalServiceTest {
 
     @Test
     void givenNonExistentAnimalName_whenUnlockAnimal_thenThrowAnimalNotFoundException() {
-        // GIVEN
         Long userId = 1L;
         String commonName = "AnimalInexistent";
 
@@ -119,7 +114,6 @@ class UserAnimalServiceTest {
                 .file(file)
                 .build();
 
-        // WHEN & THEN - SOLO el mock necessari
         when(animalRepository.findByCommonName(commonName)).thenReturn(Optional.empty());
 
         assertThrows(AnimalNotFoundException.class, () -> {

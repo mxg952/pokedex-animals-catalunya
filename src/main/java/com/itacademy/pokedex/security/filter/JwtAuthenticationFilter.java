@@ -1,7 +1,7 @@
 package com.itacademy.pokedex.security.filter;
 
-import com.itacademy.pokedex.security.service.JwtService;
 import com.itacademy.pokedex.security.service.CustomUserDetailsService;
+import com.itacademy.pokedex.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 
@@ -31,7 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        // ✅ Debug: mostra el header per verificar
         System.out.println("Authorization Header: " + authHeader);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -43,12 +41,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt = authHeader.substring(7);
             final String username = jwtService.extractUsername(jwt);
 
-            System.out.println("Extracted username: " + username); // ✅ Debug
+            System.out.println("Extracted username: " + username);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                System.out.println("UserDetails loaded: " + userDetails.getUsername()); // ✅ Debug
+                System.out.println("UserDetails loaded: " + userDetails.getUsername());
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -59,13 +57,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                    System.out.println("Authentication established for: " + username); // ✅ Debug
+                    System.out.println("Authentication established for: " + username);
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error in JWT filter: " + e.getMessage()); // ✅ Debug errors
+            System.err.println("Error in JWT filter: " + e.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
 }

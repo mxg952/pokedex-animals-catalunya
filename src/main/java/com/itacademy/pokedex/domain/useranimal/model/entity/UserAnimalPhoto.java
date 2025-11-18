@@ -46,53 +46,8 @@ public class UserAnimalPhoto {
     @Column(name = "user_animal_id", nullable = false)
     private Long userAnimalId;
 
-    // Relació ManyToOne amb UserAnimal (opcional)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_animal_id", insertable = false, updatable = false)
     private UserAnimal userAnimal;
 
-    @PrePersist
-    protected void onCreate() {
-        if (uploadedAt == null) {
-            uploadedAt = LocalDateTime.now();
-        }
-        if (status == null) {
-            status = "PENDING"; // Valor per defecte
-        }
-    }
-
-    public boolean isPending() {
-        return "PENDING".equals(status);
-    }
-
-    public boolean isApproved() {
-        return "APPROVED".equals(status);
-    }
-
-    public boolean isRejected() {
-        return "REJECTED".equals(status);
-    }
-
-    // Mètodes helpers
-    public boolean isImage() {
-        return contentType != null && contentType.startsWith("image/");
-    }
-
-    public String getFileExtension() {
-        if (originalFileName == null) return "";
-        int lastDot = originalFileName.lastIndexOf('.');
-        return lastDot > 0 ? originalFileName.substring(lastDot + 1).toLowerCase() : "";
-    }
-
-    public String getFormattedFileSize() {
-        if (fileSize == null) return "0 KB";
-        if (fileSize < 1024) return fileSize + " B";
-        if (fileSize < 1024 * 1024) return String.format("%.1f KB", fileSize / 1024.0);
-        return String.format("%.1f MB", fileSize / (1024.0 * 1024.0));
-    }
-
-    // Mètode per obtenir el path complet
-    public String getFullPath(String uploadDir) {
-        return uploadDir + "/" + fileName;
-    }
 }

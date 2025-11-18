@@ -14,28 +14,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserLogoutTest {
 
     @Mock
     UserRepository userRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private JwtService jwtService;
-
-    @Mock
-    private RegisterMapper registerMapper;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
     @InjectMocks
     UserService userService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtService jwtService;
+    @Mock
+    private RegisterMapper registerMapper;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     @Test
     void givenValidToken_whenLogout_thenTokenIsInvalidated() {

@@ -22,14 +22,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
     @Value("${jwt.secret}")
     private String secretKey;
-
     @Value("${jwt.expiration}")
     private long jwtExpiration;
-
-    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
-
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
@@ -48,18 +45,15 @@ public class JwtService {
                 .compact();
     }
 
-    // 🔹 Extreure el nom d’usuari (subject) del token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 🔹 Extreure una propietat concreta (claim)
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // 🔹 Validar token
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()))
@@ -96,13 +90,13 @@ public class JwtService {
         return invalidatedTokens.contains(token);
     }
 
-    @Scheduled(fixedRate = 3600000) // Cada hora
+    @Scheduled(fixedRate = 3600000)
     public void cleanupExpiredTokens() {
         invalidatedTokens.removeIf(token -> {
             try {
                 return isTokenExpired(token);
             } catch (Exception e) {
-                return true; // Si hi ha error, eliminar el token
+                return true;
             }
         });
     }

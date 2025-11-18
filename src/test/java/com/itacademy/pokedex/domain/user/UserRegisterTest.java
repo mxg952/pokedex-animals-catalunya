@@ -18,30 +18,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserRegisterTest {
 
     @Mock
     UserRepository userRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private JwtService jwtService;
-
-    @Mock
-    private RegisterMapper registerMapper;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
     @InjectMocks
     UserService userService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtService jwtService;
+    @Mock
+    private RegisterMapper registerMapper;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     @Test
     void givenValidUser_whenRegister_thenUserIsSavedWithEncodedPassword() {
@@ -72,7 +66,7 @@ public class UserRegisterTest {
 
         assertThatThrownBy(() -> userService.register(request))
                 .isInstanceOf(UserNameAlreadyExistsException.class)
-                .hasMessageContaining("Username already exists");
+                .hasMessageContaining("Aquest nom d'usuari ja existeix: marc. Prova amb un altre nom.");
     }
 
 }

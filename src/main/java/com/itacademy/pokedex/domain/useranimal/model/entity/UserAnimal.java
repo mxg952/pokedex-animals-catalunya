@@ -3,7 +3,10 @@ package com.itacademy.pokedex.domain.useranimal.model.entity;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,12 +47,10 @@ public class UserAnimal {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Relació OneToMany amb les fotos de l'usuari
     @OneToMany(mappedBy = "userAnimalId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<UserAnimalPhoto> photos = new ArrayList<>();
 
-    // Relació ManyToOne amb l'entitat Animal (read-only)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_id", insertable = false, updatable = false)
     private Animal animal;
@@ -59,7 +60,6 @@ public class UserAnimal {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
 
-        // Si es crea com a UNLOCK, establir la data de desbloqueig
         if (status == AnimalStatus.UNLOCK && unlockedAt == null) {
             unlockedAt = LocalDateTime.now();
         }
@@ -69,7 +69,6 @@ public class UserAnimal {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
 
-        // Si canvia de LOCK a UNLOCK, establir la data de desbloqueig
         if (status == AnimalStatus.UNLOCK && unlockedAt == null) {
             unlockedAt = LocalDateTime.now();
         }
@@ -82,42 +81,13 @@ public class UserAnimal {
         }
     }
 
-    public void lock() {
-        if (hasPhotos()) {
-            throw new IllegalStateException("No es pot bloquejar un animal amb fotos");
-        }
-        this.status = AnimalStatus.LOCK;
-    }
-
     public void addPhoto(UserAnimalPhoto photo) {
         if (photos == null) {
             photos = new ArrayList<>();
         }
 
-        // Assegurar que la foto té la referència correcta
         photo.setUserAnimalId(this.id);
         photos.add(photo);
-    }
-
-    public void removePhoto(UserAnimalPhoto photo) {
-        if (photos != null) {
-            photos.remove(photo);
-        }
-    }
-
-    public boolean removePhotoById(Long photoId) {
-        if (photos != null) {
-            return photos.removeIf(photo -> photo.getId().equals(photoId));
-        }
-        return false;
-    }
-
-    public boolean isUnlocked() {
-        return status == AnimalStatus.UNLOCK;
-    }
-
-    public boolean isLocked() {
-        return status == AnimalStatus.LOCK;
     }
 
     public boolean hasPhotos() {
@@ -130,57 +100,11 @@ public class UserAnimal {
 
     public UserAnimalPhoto getFirstPhoto() {
         if (hasPhotos()) {
-            return photos.get(0);
+            return photos.getFirst();
         }
         return null;
     }
 
-
-    public String getMainPhotoUrl() {
-        if (hasPhotos()) {
-            return getFirstPhoto().getFileName();
-        }
-        if (animal != null && animal.getPhotoUnlockFileName() != null) {
-            return animal.getPhotoUnlockFileName();
-        }
-        return customPhotoUrl;
-    }
-
-    public String getAnimalName() {
-        return animal != null ? animal.getCommonName() : "Animal " + animalId;
-    }
-
-    public String getAnimalCategory() {
-        return animal != null ? animal.getCategory() : null;
-    }
-
-    public Long getDaysSinceUnlock() {
-        if (unlockedAt == null) {
-            return null;
-        }
-        return java.time.Duration.between(unlockedAt, LocalDateTime.now()).toDays();
-    }
-
-    public boolean isOwner(Long userId) {
-        return this.userId.equals(userId);
-    }
-
-    public static UserAnimal createUnlocked(Long userId, Long animalId) {
-        return UserAnimal.builder()
-                .userId(userId)
-                .animalId(animalId)
-                .status(AnimalStatus.UNLOCK)
-                .unlockedAt(LocalDateTime.now())
-                .build();
-    }
-
-    public static UserAnimal createLocked(Long userId, Long animalId) {
-        return UserAnimal.builder()
-                .userId(userId)
-                .animalId(animalId)
-                .status(AnimalStatus.LOCK)
-                .build();
-    }
 
     @Override
     public String toString() {

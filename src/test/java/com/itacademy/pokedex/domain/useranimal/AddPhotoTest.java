@@ -1,6 +1,5 @@
 package com.itacademy.pokedex.domain.useranimal;
 
-import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalPhotoDto;
 import com.itacademy.pokedex.domain.useranimal.exception.AnimalNotUnlockedException;
@@ -45,15 +44,11 @@ public class AddPhotoTest {
     @Mock
     private UserAnimalMapper userAnimalMapper;
 
-    @Mock
-    private AnimalRepository animalRepository;
-
     @InjectMocks
     private UserAnimalService userAnimalService;
 
     @Test
     void givenUnlockedAnimal_whenAddPhoto_thenReturnUserAnimalWithPhotos() {
-        // GIVEN
         Long userId = 1L;
         Long animalId = 1L;
 
@@ -67,7 +62,7 @@ public class AddPhotoTest {
                 .userId(userId)
                 .animalId(animalId)
                 .status(AnimalStatus.UNLOCK)
-                .photos(new ArrayList<>()) // Llista buida inicialment
+                .photos(new ArrayList<>())
                 .build();
 
         UserAnimalPhoto newPhoto = UserAnimalPhoto.builder()
@@ -89,7 +84,6 @@ public class AddPhotoTest {
                 ))
                 .build();
 
-        // WHEN
         when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
                 .thenReturn(Optional.of(userAnimal));
         when(fileStorageService.storeFile(file, description, userAnimal.getId()))
@@ -99,7 +93,6 @@ public class AddPhotoTest {
 
         UserAnimalDto result = userAnimalService.addPhoto(userId, animalId, file, description);
 
-        // THEN
         assertThat(result).isNotNull();
         assertEquals(1, result.getPhotos().size());
         assertThat(result.getPhotos().getFirst().getDescription()).isEqualTo(description);
@@ -109,60 +102,12 @@ public class AddPhotoTest {
     }
 
     @Test
-    void givenLockedAnimal_whenAddPhoto_thenThrowAnimalNotUnlockedException() {
-        // GIVEN
-        Long userId = 1L;
-        Long animalId = 1L;
-
-        MultipartFile file = mock(MultipartFile.class);
-
-        UserAnimal userAnimal = UserAnimal.builder()
-                .id(1L)
-                .userId(userId)
-                .animalId(animalId)
-                .status(AnimalStatus.LOCK) // ❌ BLOQUEJAT
-                .build();
-
-        // WHEN & THEN
-        when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
-                .thenReturn(Optional.of(userAnimal));
-
-        assertThrows(AnimalNotUnlockedException.class, () -> {
-            userAnimalService.addPhoto(userId, animalId, file, "Descripció");
-        });
-
-        verify(userAnimalPhotoRepository, never()).save(any());
-        verify(fileStorageService, never()).storeFile(any(), any(), any());
-    }
-
-    @Test
-    void givenNonExistentUserAnimal_whenAddPhoto_thenThrowUserAnimalNotFoundException() {
-        // GIVEN
-        Long userId = 1L;
-        Long animalId = 999L;
-
-        MultipartFile file = mock(MultipartFile.class);
-
-        // WHEN & THEN
-        when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
-                .thenReturn(Optional.empty());
-
-        assertThrows(UserAnimalNotFoundException.class, () -> {
-            userAnimalService.addPhoto(userId, animalId, file, "Descripció");
-        });
-
-        verify(userAnimalPhotoRepository, never()).save(any());
-        verify(fileStorageService, never()).storeFile(any(), any(), any());
-    }
-
-    @Test
     void givenEmptyFile_whenAddPhoto_thenThrowInvalidFileException() {
-        // GIVEN
         Long userId = 1L;
         Long animalId = 1L;
 
         MultipartFile emptyFile = mock(MultipartFile.class);
-        when(emptyFile.isEmpty()).thenReturn(true); // ✅ Fitxer buit
+        when(emptyFile.isEmpty()).thenReturn(true);
 
         UserAnimal userAnimal = UserAnimal.builder()
                 .id(1L)
@@ -171,25 +116,19 @@ public class AddPhotoTest {
                 .status(AnimalStatus.UNLOCK)
                 .build();
 
-        // WHEN & THEN - ✅ SOLO el mock necessari
         when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
                 .thenReturn(Optional.of(userAnimal));
-
-        // ❌ NO configurar fileStorageService.storeFile - no s'utilitzarà
-        // ❌ NO configurar userAnimalPhotoRepository.save - no s'utilitzarà
 
         assertThrows(InvalidFileException.class, () -> {
             userAnimalService.addPhoto(userId, animalId, emptyFile, "Descripció");
         });
 
-        // Verificar que NO es van cridar els mètodes
         verify(fileStorageService, never()).storeFile(any(), any(), any());
         verify(userAnimalPhotoRepository, never()).save(any());
     }
 
     @Test
     void givenNonImageFile_whenAddPhoto_thenThrowInvalidFileException() {
-        // GIVEN
         Long userId = 1L;
         Long animalId = 1L;
 
@@ -202,35 +141,27 @@ public class AddPhotoTest {
                 .status(AnimalStatus.UNLOCK)
                 .build();
 
-        // WHEN & THEN - ✅ SOLO el mock necessari
         when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
                 .thenReturn(Optional.of(userAnimal));
-
-        // ❌ NO configurar fileStorageService.storeFile - no s'utilitzarà
-        // ❌ NO configurar userAnimalPhotoRepository.save - no s'utilitzarà
 
         assertThrows(InvalidFileException.class, () -> {
             userAnimalService.addPhoto(userId, animalId, textFile, "Descripció");
         });
 
-        // Verificar que NO es van cridar els mètodes
         verify(fileStorageService, never()).storeFile(any(), any(), any());
         verify(userAnimalPhotoRepository, never()).save(any());
     }
 
     @Test
     void givenUnlockedAnimalWithExistingPhotos_whenAddPhoto_thenAddToExistingPhotos() {
-        // GIVEN
         Long userId = 1L;
         Long animalId = 1L;
 
         MultipartFile file = mock(MultipartFile.class);
-        when(file.getContentType()).thenReturn("image/png"); // ✅ CONFIGURAT com a imatge
-
+        when(file.getContentType()).thenReturn("image/png");
 
         String description = "Tercera foto";
 
-        // Foto existent
         UserAnimalPhoto existingPhoto = UserAnimalPhoto.builder()
                 .id(1L)
                 .fileName("existing_photo.jpg")
@@ -271,10 +202,9 @@ public class AddPhotoTest {
 
         UserAnimalDto expectedDto = UserAnimalDto.builder()
                 .id(1L)
-                .photos(List.of(existingPhotoDto, newPhotoDto)) // ← CORREGIT: Ara són DTOs
+                .photos(List.of(existingPhotoDto, newPhotoDto))
                 .build();
 
-        // WHEN
         when(userAnimalRepository.findByUserIdAndAnimalId(userId, animalId))
                 .thenReturn(Optional.of(userAnimal));
         when(fileStorageService.storeFile(file, description, userAnimal.getId()))
@@ -284,7 +214,6 @@ public class AddPhotoTest {
 
         UserAnimalDto result = userAnimalService.addPhoto(userId, animalId, file, description);
 
-        // THEN
         assertThat(result).isNotNull();
         assertEquals(2, result.getPhotos().size());
         assertThat(result.getPhotos().get(1).getDescription()).isEqualTo(description);

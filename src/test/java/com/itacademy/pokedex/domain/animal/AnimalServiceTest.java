@@ -57,7 +57,6 @@ public class AnimalServiceTest {
 
     @Test
     void givenUnlockedAnimal_whenSearch_thenReturnFullInfo() {
-        // Given
         String animalName = "Lleó";
         Long userId = 1L;
 
@@ -74,7 +73,6 @@ public class AnimalServiceTest {
         animal.setPhotoUnlockFileName("http://photo-unlock.jpg");
         animal.setPhotoLockFileName("http://photo-lock.jpg");
 
-        // Crea los DTOs que el mapper debería retornar
         AnimalUnlockDto unlockDto = AnimalUnlockDto.builder()
                 .commonName("Lleó")
                 .scientificName("Pantera Leo")
@@ -87,7 +85,6 @@ public class AnimalServiceTest {
                 .photoUnlockUrl("http://photo-unlock.jpg")
                 .build();
 
-        // Mock del repositorio
         when(animalRepository.findByCommonNameContainingIgnoreCase(animalName))
                 .thenReturn(List.of(animal));
         when(userAnimalRepository.existsByUserIdAndAnimalIdAndStatus(userId, 1L, AnimalStatus.UNLOCK))
@@ -149,8 +146,6 @@ public class AnimalServiceTest {
         assertEquals("Lleó", resultDto.getCommonName());
         assertEquals("Pantera Leo", resultDto.getScientificName());
         assertEquals(List.of("Enero", "Febrero", "Marzo"), resultDto.getSightingMonths());
-
-
     }
 
     @Test

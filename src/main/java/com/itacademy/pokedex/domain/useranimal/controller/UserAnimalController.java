@@ -1,12 +1,9 @@
 package com.itacademy.pokedex.domain.useranimal.controller;
 
-
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.useranimal.dto.UnlockAnimalRequest;
-import com.itacademy.pokedex.domain.useranimal.dto.UpdatePhotoRequest;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
 import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalPhotoDto;
-import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimal;
 import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.service.FileStorageService;
 import com.itacademy.pokedex.domain.useranimal.service.UserAnimalService;
@@ -35,14 +32,14 @@ public class UserAnimalController {
     private final UserAnimalService userAnimalService;
     private final FileStorageService fileStorageService;
 
- @PostMapping(value = "/unlock", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/unlock", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserAnimalDto> unlockAnimal(@Valid @ModelAttribute UnlockAnimalRequest unlockAnimalRequest,
-                                                   @AuthenticationPrincipal UserDetails userDetails) {
-     Long userId = ((User) userDetails).getId();
+                                                      @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = ((User) userDetails).getId();
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(userAnimalService.unlockAnimal(userId, unlockAnimalRequest));
- }
+    }
 
 
     @GetMapping("/get")
@@ -71,7 +68,6 @@ public class UserAnimalController {
 
         UserAnimalPhoto photo = userAnimalService.getPhoto(user.getId(), photoId);
 
-        // Ara fem servir photo.getFileName() directament
         Resource file = fileStorageService.loadFile(photo.getFileName());
 
         return ResponseEntity.ok()
@@ -96,7 +92,7 @@ public class UserAnimalController {
     @PutMapping(value = "/photos/{photoId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserAnimalPhotoDto> updatePhoto(
             @PathVariable Long photoId,
-            @RequestParam(value = "file", required = false) MultipartFile file,  // ✅ OPCIONAL - nova imatge
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "description", required = false) String description,
             @AuthenticationPrincipal User user) {
 
@@ -104,5 +100,4 @@ public class UserAnimalController {
                 user.getId(), photoId, file, description);
         return ResponseEntity.ok(updatedPhoto);
     }
-
 }
