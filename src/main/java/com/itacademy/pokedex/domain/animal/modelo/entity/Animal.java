@@ -18,24 +18,26 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                     // Primary key
-    private String commonName;           // Nom coloquial
-    private String scientificName;       // Nom científic
-    private String category;             // Category (mammal, bird, reptile, etc.)
+    private Long id;
+    private String commonName;
+    private String scientificName;
+    private String category;
     private String visibilityProbability;
 
     @ElementCollection
     @CollectionTable(name = "animal_sighting_months", joinColumns = @JoinColumn(name = "animal_id"))
     @Column(name = "month")
-    private List<String> sightingMonths;// Months of the year when it is usually seen
+    private List<String> sightingMonths;
 
-    @Column(columnDefinition = "TEXT") // Brief description of the animal
+    @Column(columnDefinition = "TEXT")
     private String shortDescription;
 
     @Column(columnDefinition = "TEXT")
-    private String locationDescription;//
-    // Description of the habitat/location
+    private String locationDescription;
+
+    @Column(columnDefinition = "TEXT")
     private String mapUrl;
+
     private String photoLockFileName;
     private String photoUnlockFileName;
 }

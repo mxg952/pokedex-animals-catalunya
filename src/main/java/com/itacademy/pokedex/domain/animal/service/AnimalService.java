@@ -6,8 +6,8 @@ import com.itacademy.pokedex.domain.animal.mapper.AnimalMapper;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
-import org.springframework.stereotype.Service;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,18 +29,17 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public List<AnimalDto> searchAnimal(String name, Long userId) {
+    public List<AnimalDto> searchAnimal(String animalName, Long userId) {
 
         List<Animal> animals = animalRepository
-                .findByCommonNameContainingIgnoreCase(name);
+                .findByCommonNameContainingIgnoreCase(animalName);
 
         if (animals.isEmpty()) {
-            throw new AnimalNotFoundException(name);
+            throw new AnimalNotFoundException(animalName);
         }
 
         return animals.stream()
                 .map(animal -> {
-                    // Si no hi ha userId, retorna info bloquejada
                     if (userId == null || !userAnimalRepository.existsByUserIdAndAnimalIdAndStatus(userId, animal.getId(), AnimalStatus.UNLOCK)) {
                         return animalMapper.toLockDto(animal);
                     } else {
@@ -49,10 +48,9 @@ public class AnimalService {
                 })
                 .collect(Collectors.toList());
     }
+
     public Animal getAnimalById(Long id) {
         return animalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Animal no trobat amb ID: " + id));
     }
-
-
 }

@@ -12,14 +12,13 @@ import java.util.List;
 @Builder
 @Data
 public class AnimalUnlockDto implements AnimalDto {
-    private String commonName;           // Nom coloquial
-    private String scientificName;       // Nom científic
-    private String category;             // Category (mammal, bird, reptile, etc.)
-    private String visibilityProbability; // Probability of sighting (low, normal, high)
-    private List<String> sightingMonths; // Months of the year when it is usually seen
-    private String shortDescription;     // Brief description of the animal
-    private String locationDescription;  // Description of the habitat/location
+    private String commonName;
+    private String scientificName;
+    private String category;
+    private String visibilityProbability;
+    private List<String> sightingMonths;
+    private String shortDescription;
+    private String locationDescription;
     private String mapUrl;
     private String photoUnlockUrl;
-
 }

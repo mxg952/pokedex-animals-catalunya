@@ -24,13 +24,12 @@ import java.util.stream.Collectors;
 public class AnimalController {
 
     private final AnimalService animalService;
-    private final AnimalMapper animalMapper;  // ✅ INJECTA el mapper
+    private final AnimalMapper animalMapper;
 
     @GetMapping("/get")
-    public ResponseEntity<List<AnimalLockDto>> getAllAnimals() {  // ✅ Retorna DTO
+    public ResponseEntity<List<AnimalLockDto>> getAllAnimals() {
         List<Animal> animals = animalService.getAllAnimals();
 
-        // ✅ TRANSFORMA entitats a DTOs amb URLs completes
         List<AnimalLockDto> animalDtos = animals.stream()
                 .map(animalMapper::toLockDto)
                 .collect(Collectors.toList());
@@ -41,12 +40,10 @@ public class AnimalController {
                 .body(animalDtos);
     }
 
-    // ✅ AFEGEIX endpoint per animal desbloquejat
     @GetMapping("/{id}/unlocked")
     public ResponseEntity<?> getUnlockedAnimal(@PathVariable Long id) {
         try {
             Animal animal = animalService.getAnimalById(id);
-            // ✅ Transforma a DTO amb URL desbloquejada
             return ResponseEntity.ok(animalMapper.toUnlockDto(animal));
         } catch (Exception e) {
             log.error("Error obtenint animal desbloquejat: {}", id, e);
@@ -55,11 +52,8 @@ public class AnimalController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<
-            AnimalDto>> searchAnimals(
-            @RequestParam String name,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
+    public ResponseEntity<List<AnimalDto>> searchAnimals( @RequestParam String name,
+                                                          @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

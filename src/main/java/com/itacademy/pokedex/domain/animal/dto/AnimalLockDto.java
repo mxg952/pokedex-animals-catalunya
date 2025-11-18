@@ -15,14 +15,14 @@ public class AnimalLockDto implements AnimalDto {
     private Long id;
     private String commonName;
     private String scientificName;
-    private String category;              // ✅ AFEGEIX
-    private String visibilityProbability; // ✅ AFEGEIX
+    private String category;
+    private String visibilityProbability;
     private List<String> sightingMonths;
-    private String shortDescription;      // ✅ AFEGEIX
+    private String shortDescription;
     private String locationDescription;
     private String mapUrl;
     private String photoLockUrl;
-    private String photoUnlockUrl;        // ✅ AFEGEIX (per al visualitzador)
+    private String photoUnlockUrl;
     private String message;
-    private Boolean isLocked;             // ✅ AFEGEIX (calculat)
+    private Boolean isLocked;
 }

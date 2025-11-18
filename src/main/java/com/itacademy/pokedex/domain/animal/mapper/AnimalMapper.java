@@ -15,7 +15,6 @@ public class AnimalMapper {
     private String baseUrl;
 
     public AnimalUnlockDto toUnlockDto(Animal animal) {
-        // ✅ GENERA la URL completa abans del return
         String unlockImageUrl = baseUrl + "/api/images/animals/unlocked/" +
                 (animal.getPhotoUnlockFileName() != null ? animal.getPhotoUnlockFileName() : "default_animal.jpg");
 
@@ -30,7 +29,7 @@ public class AnimalMapper {
                 .shortDescription(animal.getShortDescription())
                 .locationDescription(animal.getLocationDescription())
                 .mapUrl(animal.getMapUrl())
-                .photoUnlockUrl(unlockImageUrl)  // ✅ URL CORRECTA
+                .photoUnlockUrl(unlockImageUrl)
                 .build();
     }
 
@@ -48,15 +47,15 @@ public class AnimalMapper {
                 .id(animal.getId())
                 .commonName(animal.getCommonName())
                 .scientificName(animal.getScientificName())
-                .category(animal.getCategory())                    // ✅
-                .visibilityProbability(animal.getVisibilityProbability()) // ✅
+                .category(animal.getCategory())
+                .visibilityProbability(animal.getVisibilityProbability())
                 .sightingMonths(animal.getSightingMonths())
-                .shortDescription(animal.getShortDescription())    // ✅
+                .shortDescription(animal.getShortDescription())
                 .locationDescription(animal.getLocationDescription())
                 .mapUrl(animal.getMapUrl())
                 .photoLockUrl(lockImageUrl)
-                .photoUnlockUrl(unlockImageUrl)                    // ✅
-                .isLocked(true)                                    // ✅ SEMPRE bloquejat en aquest DTO
+                .photoUnlockUrl(unlockImageUrl)
+                .isLocked(true)
                 .message("Desbloqueja per obtenir més informació!")
                 .build();
     }
