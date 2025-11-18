@@ -3,16 +3,12 @@ package com.itacademy.pokedex.domain.admin.service;
 import com.itacademy.pokedex.domain.admin.dto.AdminStatsDto;
 import com.itacademy.pokedex.domain.admin.dto.CreateAnimalRequest;
 import com.itacademy.pokedex.domain.admin.dto.UserInfoDto;
-import com.itacademy.pokedex.domain.admin.exception.PhotoDeletionException;
 import com.itacademy.pokedex.domain.animal.modelo.entity.Animal;
 import com.itacademy.pokedex.domain.animal.repository.AnimalRepository;
 import com.itacademy.pokedex.domain.user.modelo.entity.User;
 import com.itacademy.pokedex.domain.user.repository.UserRepository;
-import com.itacademy.pokedex.domain.useranimal.dto.UserAnimalDto;
-import com.itacademy.pokedex.domain.useranimal.exception.PhotoNotFoundException;
 import com.itacademy.pokedex.domain.useranimal.mapper.UserAnimalMapper;
 import com.itacademy.pokedex.domain.useranimal.model.AnimalStatus;
-import com.itacademy.pokedex.domain.useranimal.model.entity.UserAnimalPhoto;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalPhotoRepository;
 import com.itacademy.pokedex.domain.useranimal.repository.UserAnimalRepository;
 import com.itacademy.pokedex.domain.useranimal.service.FileStorageService;
@@ -20,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +45,6 @@ public class AdminService {
                 .build();
     }
 
-    // 🔹 Mètodes privats amb responsabilitats úniques
     private Long getTotalUsers() {
         return userRepository.count();
     }
@@ -95,7 +89,6 @@ public class AdminService {
         String unlockedImageFileName = null;
 
         try {
-            // Guardar imágenes si se han proporcionado
             if (request.getLockedImage() != null && !request.getLockedImage().isEmpty()) {
                 lockedImageFileName = fileStorageService.storeAnimalImage(request.getLockedImage(), "locked");
             }
@@ -104,7 +97,6 @@ public class AdminService {
                 unlockedImageFileName = fileStorageService.storeAnimalImage(request.getUnlockedImage(), "unlocked");
             }
 
-            // Convertir sightingMonths de String a List
             List<String> sightingMonthsList = new ArrayList<>();
             if (request.getSightingMonths() != null && !request.getSightingMonths().trim().isEmpty()) {
                 sightingMonthsList = Arrays.stream(request.getSightingMonths().split(","))
@@ -127,13 +119,12 @@ public class AdminService {
                     .build();
 
             Animal savedAnimal = animalRepository.save(animal);
-            log.info("✅ Nou animal creat: {} (ID: {})", savedAnimal.getCommonName(), savedAnimal.getId());
+            log.info("Nou animal creat: {} (ID: {})", savedAnimal.getCommonName(), savedAnimal.getId());
 
             return savedAnimal;
 
         } catch (Exception e) {
-            // En caso de error, limpiar archivos subidos
-            log.error("❌ Error creant animal: {}", e.getMessage(), e);
+            log.error("Error creant animal: {}", e.getMessage(), e);
 
             if (lockedImageFileName != null) {
                 fileStorageService.deleteAnimalImage("locked", lockedImageFileName);
@@ -141,28 +132,7 @@ public class AdminService {
             if (unlockedImageFileName != null) {
                 fileStorageService.deleteAnimalImage("unlocked", unlockedImageFileName);
             }
-
             throw new RuntimeException("Error creant animal: " + e.getMessage(), e);
         }
-    }
-
-    public void deleteUserPhoto(Long photoId) {
-        UserAnimalPhoto photo = userAnimalPhotoRepository.findById(photoId)
-                .orElseThrow(() -> new PhotoNotFoundException(photoId));
-
-        try {
-            // fileStorageService.deleteFile(photo.getPhotoUrl());
-            userAnimalPhotoRepository.delete(photo);
-            log.info("Foto eliminada correctament: {}", photoId);
-        } catch (Exception e) {
-            log.error("Error eliminant foto {}: {}", photoId, e.getMessage());
-            throw new PhotoDeletionException("Error eliminant la foto");
-        }
-    }
-
-    public List<UserAnimalDto> getAllUserAnimals() {
-        return userAnimalRepository.findAll().stream()
-                .map(userAnimalMapper::toDto)
-                .toList();
     }
 }

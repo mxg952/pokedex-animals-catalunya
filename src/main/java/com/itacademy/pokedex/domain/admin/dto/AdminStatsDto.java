@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminStatsDto {
-
     private Long totalUsers;
     private Long totalUnlockedAnimals;
     private Long totalPhotos;

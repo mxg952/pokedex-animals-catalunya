@@ -40,10 +40,4 @@ public class AdminController {
         Animal createdAnimal = adminService.createAnimal(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAnimal);
     }
-
-    @DeleteMapping("/photos/{photoId}")
-    public ResponseEntity<Void> deletePhoto(@PathVariable Long photoId) {
-        adminService.deleteUserPhoto(photoId);
-        return ResponseEntity.noContent().build();
-    }
 }

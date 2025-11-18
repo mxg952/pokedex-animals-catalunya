@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
-public class  GlobalExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNameAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UserNameAlreadyExistsException ex) {
